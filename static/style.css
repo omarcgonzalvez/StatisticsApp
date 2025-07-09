@@ -1,0 +1,270 @@
+/* =========== CONTENEDOR PRINCIPAL =========== */
+.layout {
+  display: flex;
+  align-items: flex-start;   /* alinea todo por arriba */
+  gap: 24px;                 /* espacio entre columnas */
+  padding-inline: 100px
+}
+
+/*SCREEN 2.3.4.5....*/
+.screen2Class,.screen3Class,.screen4Class,.screen5Class,.screen6Class,.screen7Class{
+  align-items: flex-start;   /* alinea todo por arriba */
+  gap: 24px;                 /* espacio entre columnas */
+  padding-inline: 100px;
+
+}
+
+/*Encbezado para screen2*/
+.screen2HeaderClass,.screen3HeaderClass,.screen4HeaderClass,.screen5HeaderClass,.screen6HeaderClass,.screen7HeaderClass{
+  display: flex;
+  align-items: center;
+  gap: 50px;
+  margin-bottom: 30px;
+}
+
+/* Contenedor donde van los dos controles */
+.screen2SubHeaderClass, .screen3SubHeaderClass, .screen4SubHeaderClass, .screen5SubHeaderClass, .screen6SubHeaderClass, .screen7SubHeaderClass{
+  display: flex;
+  align-items: center;
+  gap: 50px;         /* ← separación fija entre combobox y fecha */
+  margin-top: 20px;  /* opcional: aire respecto al header */
+}
+
+/* BODYCLASS*/
+.screen2BodyClass, .screen3BodyClass, .screen4BodyClass, .screen5BodyClass, .screen6BodyClass, .screen7BodyClass{
+  display: flex;
+  gap: 40px;             /* espacio entre columnas */
+  align-items: flex-start; /* alinea todo arriba */
+}
+
+.screen2BodyClass > div, .screen3BodyClass > div, .screen4BodyClass > div, .screen5BodyClass > div, .screen6BodyClass > div, .screen7BodyClass > div{
+  display: flex;
+  flex-direction: column; /* apilar los hijos verticalmente */
+}
+
+
+
+/* =========== COLUMNA DE BOTONES =========== */
+.button-container {
+  display: flex;
+  flex-direction: column;    /* apila en vertical */
+  gap: 20px;
+  max-width: 300px;          /* ancho opcional */
+}
+
+/* =========== BOTONES =========== */
+.button {
+  all: unset;                /* reset visual HTML nativo */
+  box-sizing: border-box;
+  cursor: pointer;
+
+  border: 1px solid rgba(0,0,0,0.15);
+  background-color: #caf0ff;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.07);
+  font: 500 16px/1 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #1a1a1a;
+  text-align: center;
+  transition: transform .2s ease, box-shadow .2s ease;
+  width: 200px;
+}
+
+.button:hover {
+  transform: translateY(-3px);
+  background-color: #f9fbff;
+  box-shadow: 0 5px 12px rgba(0,0,0,0.1);
+}
+
+.button:focus-visible {
+  outline: 2px solid #4d90fe;
+  outline-offset: 2px;
+}
+
+/* =========== COLUMNA DE IMÁGENES PEGADA A LA DERECHA =========== */
+.image-container {
+  margin-left: auto;         /* empuja toda la columna hacia la derecha */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;     /* alinea cada imagen por su borde derecho */
+}
+
+.image-container img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin-bottom: 20px;
+}
+
+/* =========== MEDIA QUERY RESPONSIVE (opcional) =========== */
+@media (max-width: 700px) {
+  .layout {
+    flex-direction: column;  /* botones arriba, imágenes debajo */
+    align-items: stretch;
+  }
+
+  .image-container {
+    margin-left: 0;          /* vuelve al flujo normal */
+    align-items: center;     /* centra imágenes en móvil */
+  }
+}
+/* CONTENEDOR PRINCIPAL: botones + imágenes */
+.layout {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+
+  /* —— NUEVO ——  margen interno izquierda / derecha */
+  padding-inline: 100px;   /* ≈16 px por cada lado. Sube o baja al gusto */
+}
+
+/* (lo demás permanece igual…) */
+
+/* COLUMNA DE IMÁGENES PEGADA A LA DERECHA */
+.image-container {
+  margin-left: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.image-container img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin-bottom: 50px;
+}
+.hidden { display: none !important; }
+
+/* =========== COMBOBOX (máquina) =========== */
+.comboBoxClass {
+  /* quita el aspecto nativo del sistema */
+  -webkit-appearance: none;
+  appearance: none;
+
+  /* dimensiones coherentes con el .button */
+  width:  200px;          /* o 100% si lo prefieres fluido */
+  height: 48px;
+  padding: 12px 40px 12px 15px;
+  box-sizing: border-box;
+
+  /* misma tipografía y colores que el botón */
+  border: 1px solid rgba(0,0,0,0.15);
+  background-color: #caf0ff;
+  border-radius: 10px;
+  font: 500 16px/1 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #1a1a1a;
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.07);
+  transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+
+  /* flecha SVG incrustada; funciona en todos los navegadores modernos */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23000' d='M6 8 0 0h12z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 12px 8px;
+}
+
+.comboBoxClass:hover {
+  background-color: #f9fbff;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 12px rgba(0,0,0,0.10);
+}
+
+.comboBoxClass:focus-visible {
+  outline: 2px solid #4d90fe;
+  outline-offset: 2px;
+}
+
+/* =========== INPUT FECHA/HORA (igual que botón y combobox) =========== */
+.datetimeInputClass {
+  /* reset visual */
+  -webkit-appearance: none;
+  appearance: none;
+
+  /* medidas coherentes */
+  width: 200px;          /* o 100 % si quieres fluido */
+  height: 48px;
+  padding: 12px 15px;    /* sin flecha, no necesitas 40 px a la derecha */
+  box-sizing: border-box;
+
+  /* misma tipografía y colores */
+  border: 1px solid rgba(0,0,0,0.15);
+  background-color: #caf0ff;
+  border-radius: 10px;
+  font: 500 16px/1 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #1a1a1a;
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.07);
+  transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+}
+
+.datetimeInputClass:hover {
+  background-color: #f9fbff;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 12px rgba(0,0,0,0.10);
+}
+
+.datetimeInputClass:focus-visible {
+  outline: 2px solid #4d90fe;
+  outline-offset: 2px;
+}
+
+.containerClass {
+  all: unset;
+  box-sizing: border-box;
+  cursor: default;  /* como es solo info, no es clickable */
+  
+  border: 1px solid rgba(0,0,0,0.15);
+  background-color: #caf0ff;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.07);
+  font: 500 16px/1 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #1a1a1a;
+  text-align: center;
+  width: 200px;
+  margin-bottom: 12px;  /* para que no queden pegados */
+  user-select: none;    /* no seleccionable */
+  transition: none;     /* sin animaciones para info */
+}
+.containerClass:hover {
+  background-color: #f9fbff;
+  box-shadow: 0 5px 12px rgba(0,0,0,0.10);
+}
+
+/*ESTILOS PARA EL BOTON DEL FILTRO*/
+/* botón filtrado activado (pantallas de “filtrar”) */
+.filterBtn--on {
+  background-color: #85ff87;   /* verde muy suave */
+  border-color: #c3e6cb;
+  color: #155724;
+}
+
+/* botón filtrado desactivado (pantallas “normales”) */
+.filterBtn--off {
+  background-color: #ff5555;   /* rojo muy suave */
+  border-color: #f5c6cb;
+  color: #721c24;
+}
+
+/* imagen flotante */
+.aps3d-float{
+  position:absolute;
+  top:10px;
+  right:50px;
+  width:30vw;           /* 30 % del ancho de ventana */
+  max-width:500px;      /* nunca más de 500 px       */
+  height:auto;          /* mantiene aspecto          */
+  z-index:10;
+  pointer-events:none;
+}
+
+/* en pantallas pequeñas la escondes o la haces más chica */
+@media (max-width:900px){
+  .aps3d-float{ width:40vw; }
+}
+@media (max-width:600px){
+  .aps3d-float{ display:none; }  /* o width:70vw etc. */
+}
+ 
