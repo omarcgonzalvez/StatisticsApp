@@ -254,7 +254,7 @@
   top:10px;
   right:50px;
   width:30vw;           /* 30 % del ancho de ventana */
-  max-width:500px;      /* nunca más de 500 px       */
+  max-width:400px;      /* nunca más de 500 px       */
   height:auto;          /* mantiene aspecto          */
   z-index:10;
   pointer-events:none;
