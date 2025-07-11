@@ -1,14 +1,17 @@
 from flask import Flask, render_template, request, jsonify
-from db import obtener_datos, obtener_filas
+from db import obtener_datos, obtener_filas, obtener_datos_por_fecha
 from datetime import datetime
 from collections import defaultdict
 
 app = Flask(__name__)
 
-@app.route('/')
+@app.route('/') #RUTA INICIAL
 def index():
     return render_template('index.html')
 
+###################
+#### API DATOS #### DEVUELVE TODOS LOS CAMPOS ==> 1 SOLA MAQUINA + 1 SOLA FECHA
+###################
 @app.route('/api/datos')
 def api_datos():
     maquina = request.args.get('maquina')
@@ -24,19 +27,25 @@ def api_datos():
 
     return jsonify(datos)
 
-@app.route('/api/kpis_por_fecha')
-def api_kpis_por_fecha():
+#############################
+#### API DATOS POR FECHA #### DEVUELVE TODOS LOS CAMPOS PARA TODAS LAS MAQUINAS EN UNA FECHA
+#############################
+
+@app.route('/api/datos_por_fecha')
+def api_datos_por_fecha():
     fecha = request.args.get('fecha')
     if not fecha:
         return jsonify({'error': 'Parámetro "fecha" requerido'}), 400
 
-    conn = obtener_filas()
-    # Aquí el código que tenías para filtrar y responder con KPIs agrupados
+    filas = obtener_datos_por_fecha(fecha)
 
-    # Lo dejo como antes:
-    conn = obtener_filas()
-    # Filtra por fecha, crea resultado y retorna JSON...
-    # (Puedes copiar el código original y adaptarlo aquí)
+    if not filas:
+        return jsonify({'error': 'No se encontraron datos'}), 404
+
+    # Agrupar por DeviceName
+    datos_por_maquina = {row['DeviceName']: row for row in filas}
+    return jsonify(datos_por_maquina)
+
 
 # Funciones auxiliares para api_diferencia (puedes mover a utils.py si quieres)
 def convertir_a_segundos(valor):

@@ -1,11 +1,11 @@
 import sqlite3
 
-DB_PATH = 'database.db'
+DB_PATH = 'database.db' #NOMBRE DE LA BASE DE DATOS
 
-def get_conn():
+def get_conn(): #Definimos conexión a la base de datos
     return sqlite3.connect(DB_PATH)
 
-def create_table():
+def create_table(): #Creamos la estructura de la tabla de la base de datos
     with get_conn() as conn:
         conn.execute('''
             CREATE TABLE IF NOT EXISTS Statistics_APS3D (
@@ -34,7 +34,7 @@ def create_table():
         ''')
         conn.commit()
 
-def insert_or_update(data):
+def insert_or_update(data): #Insertamos o actualizamos los datos
     with get_conn() as conn:
         for device, dates in data.items():
             for date, stats in dates.items():
@@ -65,7 +65,7 @@ def insert_or_update(data):
                 ))
         conn.commit()
 
-def obtener_datos(maquina, fecha):
+def obtener_datos(maquina, fecha): #Devuelve todos los campos de la tabla para una máquina específica (maquina) en una fecha (fecha).
     with get_conn() as conn:
         cursor = conn.execute("""
             SELECT * FROM Statistics_APS3D WHERE DeviceName = ? AND Date = ?
@@ -78,7 +78,20 @@ def obtener_datos(maquina, fecha):
         columnas = [desc[0] for desc in cursor.description]
         return dict(zip(columnas, fila))
 
-def obtener_filas():
+def obtener_datos_por_fecha(fecha):#Devuelve todos los campos de la tabla para todas las máquinas que tengan datos en la fecha proporcionada.
+    with get_conn() as conn:
+        cursor = conn.execute("""
+            SELECT * FROM Statistics_APS3D WHERE Date = ?
+        """, (fecha,))
+        filas = cursor.fetchall()
+
+        if not filas:
+            return None
+                
+        columnas = [desc[0] for desc in cursor.description]
+        return [dict(zip(columnas, fila)) for fila in filas]
+
+def obtener_filas():               #Devuelve todas las filas de la tabla   
     with get_conn() as conn:
         cursor = conn.execute("""
         SELECT DeviceName, Date,
@@ -91,3 +104,4 @@ def obtener_filas():
             FROM Statistics_APS3D
         """)
         return cursor.fetchall()
+
