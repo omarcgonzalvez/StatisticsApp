@@ -73,8 +73,8 @@ def main():
         plc = snap7.client.Client()
         try:
             plc.connect('192.168.2.13', 0, 1)
-            num_elementos = 10
-            elemento_size = 82
+            num_elementos = 10   #numero de APS3D STATISTICS ARRAYS (NUMERO DE APS3D QUE HAY)
+            elemento_size = 82  #TAMAÑO DE ARRAY DE DATOSS
             total_length = elemento_size * num_elementos
 
             db_bytes = plc.db_read(86, 0, total_length)

@@ -32,6 +32,7 @@ def create_table():
                 PRIMARY KEY (DeviceName, Date)
             )
         ''')
+        conn.commit()
 
 def insert_or_update(data):
     with get_conn() as conn:
@@ -52,16 +53,17 @@ def insert_or_update(data):
                     stats["Movements_Completed"],
                     stats["Tasks_Completed"],
                     stats["Errors"],
-                    engines["AXIS_X"]["Cycles"],
+                    engines["AXIS_X"]["Cycles"],    # AXIS_X
                     engines["AXIS_X"]["MoveTime"],
                     engines["AXIS_X"]["Distance"],
-                    engines["AXIS_Z"]["Cycles"],
+                    engines["AXIS_Z"]["Cycles"],    # AXIS_Z
                     engines["AXIS_Z"]["MoveTime"],
                     engines["AXIS_Z"]["Distance"],
-                    engines["AXIS_Y"]["Cycles"],
+                    engines["AXIS_Y"]["Cycles"],    # AXIS_Y
                     engines["AXIS_Y"]["MoveTime"],
                     engines["AXIS_Y"]["Distance"]
                 ))
+        conn.commit()
 
 def obtener_datos(maquina, fecha):
     with get_conn() as conn:
@@ -69,12 +71,23 @@ def obtener_datos(maquina, fecha):
             SELECT * FROM Statistics_APS3D WHERE DeviceName = ? AND Date = ?
         """, (maquina, fecha))
         fila = cursor.fetchone()
+        
         if not fila:
             return None
+        
         columnas = [desc[0] for desc in cursor.description]
         return dict(zip(columnas, fila))
 
 def obtener_filas():
     with get_conn() as conn:
-        cursor = conn.execute("SELECT * FROM Statistics_APS3D")
+        cursor = conn.execute("""
+        SELECT DeviceName, Date,
+               TimeChargingBatt, AutoAndSearch, AutoAndOrder,
+               Time_Blocked, Time_In_Error,
+               Canceled_Tasks, Movements_Completed, Tasks_Completed, Errors,
+               AXIS_X_Distance, AXIS_Z_Distance, AXIS_Y_Distance,
+               AXIS_X_MoveTime, AXIS_Y_MoveTime, AXIS_Z_MoveTime,
+               AXIS_X_Cycles, AXIS_Y_Cycles, AXIS_Z_Cycles
+            FROM Statistics_APS3D
+        """)
         return cursor.fetchall()
