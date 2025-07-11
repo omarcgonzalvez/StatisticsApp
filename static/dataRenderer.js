@@ -110,12 +110,12 @@ export function addContainer (text) {
   
   /* 1‑a   Mapa pantalla → endpoint  */
   const ENDPOINTS = {
-    screen2: '/api/resumen',
-    screen3: '/api/filtrar',
-    screen4: '/api/total',
-    screen5: '/api/totalFiltrar',
-    screen6: '/api/promedios',
-    screen7: '/api/promediosFiltrar',
+    screen2: '/api/datos',
+    screen3: '/api/diferencia',
+    screen4: '/api/datos_por_fecha',
+    screen5: '/api/diferencia',
+    screen6: '/api/datos_por_fecha',
+    screen7: '/api/diferencia',
   };
   
   /* 1‑b   Recoge máquina y fechas de la UI (si existen) */
@@ -125,17 +125,26 @@ export function addContainer (text) {
   
     const q = {};
     const sel = root.querySelector('.comboBoxClass');
-    if (sel)  q.machine = sel.value;
+    if (sel)  q.maquina = sel.value;
   
     const start = root.querySelector('[data-role="start"]')?.value;
     const end   = root.querySelector('[data-role="end"]')?.value;
+    screenPrefix
+
     if (start) q.from = start;
     if (end)   q.to   = end;
+
+    //Si no hay ni start ni end significa que hay fecha simple
+    if (!start && !end){
+      const singleDate = root.querySelector('input.datetimeInputClass[type="datetime-local"]')?.value;
+      if (singleDate) q.fecha = singleDate;
+    }
+    
     return q;
   }
   
   ///////////////////////////////////////////////////////
-  // 3.  Capa de acceso a datos                      //
+  // 3.  Capa de acceso a datos                        //
   ///////////////////////////////////////////////////////
   
   async function loadData (screenPrefix, fallback = {}) {
