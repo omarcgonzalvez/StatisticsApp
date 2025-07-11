@@ -67,6 +67,10 @@ def segundos_a_hhmmss(segundos):
     segundos = segundos % 60
     return f"{horas:02}:{minutos:02}:{segundos:02}"
 
+#############################
+#### API DIFERENCIA      #### DEVUELVE YA FILTRADOS TODOS LOS CAMPOS PARA TODAS LAS MAQUINAS 
+############################# ENTRE UNA FECHA INICIAL Y UNA FECHA FINAL. TODOS LOS DATOS ENTRE ESAS FECHAS
+
 @app.route('/api/diferencia')
 def api_diferencia():
     fecha_inicial_str = request.args.get('fecha_inicial')
@@ -93,9 +97,107 @@ def api_diferencia():
 
     return jsonify(diferencias)
 
-# Puedes copiar la función calcular_diferencias tal cual del original aquí o moverla a utils.py
 
 def calcular_diferencias(filas, fecha_ini_dt, fecha_fin_dt):
-    # copia aquí la lógica de calcular_diferencias (igual que tu código original)
-    pass  # reemplaza con el código
+    from collections import defaultdict
 
+    datos_por_dispositivo = defaultdict(list)
+
+    for fila in filas:
+        device = fila[0]
+        fecha_dt = datetime.fromisoformat(fila[1])
+        datos = fila[2:]
+        datos_por_dispositivo[device].append((fecha_dt, datos))
+
+    campos = [
+        "TimeChargingBatt", "AutoAndSearch", "AutoAndOrder",
+        "Time_Blocked", "Time_In_Error",
+        "Canceled_Tasks", "Movements_Completed", "Tasks_Completed", "Errors",
+        "AXIS_X_Distance", "AXIS_Z_Distance", "AXIS_Y_Distance",
+        "AXIS_X_MoveTime", "AXIS_Y_MoveTime", "AXIS_Z_MoveTime",
+        "AXIS_X_Cycles", "AXIS_Y_Cycles", "AXIS_Z_Cycles"
+    ]
+
+    campos_tiempo = {
+        "TimeChargingBatt", "AutoAndSearch", "AutoAndOrder",
+        "Time_Blocked", "Time_In_Error",
+        "AXIS_X_MoveTime", "AXIS_Y_MoveTime", "AXIS_Z_MoveTime"
+    }
+
+    diferencias = {}
+
+    for device, registros in datos_por_dispositivo.items():
+        registros_ordenados = sorted(registros, key=lambda x: x[0])
+
+        # CASO MISMO DÍA
+        if fecha_ini_dt.date() == fecha_fin_dt.date():
+            val_inicio = None
+            val_final = None
+            for dt, valores in registros_ordenados:
+                if dt == fecha_ini_dt:
+                    val_inicio = valores
+                elif dt == fecha_fin_dt:
+                    val_final = valores
+            if not (val_inicio and val_final):
+                continue  # no suficientes datos para este dispositivo
+            diferencia = {}
+            for i, campo in enumerate(campos):
+                ini = convertir_a_segundos(val_inicio[i])
+                fin = convertir_a_segundos(val_final[i])
+                total = fin - ini
+                total = max(total, 0)  # evitar negativos
+                if campo in campos_tiempo:
+                    diferencia[campo] = segundos_a_hhmmss(total)
+                else:
+                    diferencia[campo] = int(round(total))
+            diferencias[device] = diferencia
+            continue
+
+        # CASO FECHAS DIFERENTES (lógica original)
+        val_inicio = val_max_ini = val_final = None
+        intermedios_por_dia = defaultdict(lambda: [0] * len(campos))
+
+        for dt, valores in registros_ordenados:
+            if dt == fecha_ini_dt:
+                val_inicio = valores
+            elif dt.date() == fecha_ini_dt.date():
+                if not val_max_ini:
+                    val_max_ini = valores
+                else:
+                    val_max_ini = [
+                        valores[i] if convertir_a_segundos(valores[i]) > convertir_a_segundos(val_max_ini[i])
+                        else val_max_ini[i]
+                        for i in range(len(campos))
+                    ]
+            elif fecha_ini_dt.date() < dt.date() < fecha_fin_dt.date():
+                dia = dt.date()
+                for i in range(len(campos)):
+                    valor_actual = convertir_a_segundos(valores[i])
+                    if valor_actual > intermedios_por_dia[dia][i]:
+                        intermedios_por_dia[dia][i] = valor_actual
+            elif dt == fecha_fin_dt:
+                val_final = valores
+
+        if not (val_inicio and val_max_ini and val_final):
+            continue
+
+        intermedios_sumados = [0] * len(campos)
+        for valores_dia in intermedios_por_dia.values():
+            for i in range(len(campos)):
+                intermedios_sumados[i] += valores_dia[i]
+
+        diferencia = {}
+        for i, campo in enumerate(campos):
+            ini = convertir_a_segundos(val_inicio[i])
+            max_ini = convertir_a_segundos(val_max_ini[i])
+            fin = convertir_a_segundos(val_final[i])
+            total = (max_ini - ini) + intermedios_sumados[i] + fin
+
+            if campo in campos_tiempo:
+                diferencia[campo] = segundos_a_hhmmss(total)
+            else:
+                diferencia[campo] = int(round(total))
+
+        diferencias[device] = diferencia
+
+    return diferencias
