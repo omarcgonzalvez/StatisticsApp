@@ -76,7 +76,7 @@ function refreshInitializeScreen(screen) {
 
     } else {
       // ——— Resto de pantallas (sólo un date‑input) ———if (!yaTieneValor) input.value = nowISO(); SI QUEREMOS CONSERVAR VALOR
-      input.value = nowISO();
+      input.value = nowISO(); //'2025-06-13T13:10';
     }
   });
 }

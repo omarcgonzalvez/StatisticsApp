@@ -194,7 +194,7 @@ function normalizeData(data) {
     const end = root.querySelector('[data-role="end"]');
 
     if (start) {
-      q.from = start.value;
+      q.fecha_inicial = start.value;
 
       // Verifica si el listener ya está registrado
       if (!start.dataset.listenerAdded) {
@@ -206,7 +206,7 @@ function normalizeData(data) {
     }
 
     if (end) {
-      q.to = end.value;
+      q.fecha_final = end.value;
 
       // Verifica si el listener ya está registrado
       if (!end.dataset.listenerAdded) {
@@ -288,7 +288,9 @@ function normalizeData(data) {
     'Time_Blocked',
     'Time_In_Error'
     ]);
-    addPieChart('screen2OrdersContainer', [100, 100, 100, 100], 
+    console.log('[DEBUGGGGGDEBUGGGGGDEBUGGGG] orders:', data.orders.map(o => o.value));
+
+    addPieChart('screen2OrdersContainer', [100, 100, 100], 
       [
         'Completed Tasks',
         'Canceled Tasks',
