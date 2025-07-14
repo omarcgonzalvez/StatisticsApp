@@ -13,7 +13,7 @@ const screenHeaderClasses = '.screen2HeaderClass,.screen3HeaderClass,.screen4Hea
 const screenSubHeaderClasses = '.screen2SubHeaderClass, .screen3SubHeaderClass, .screen4SubHeaderClass, .screen5SubHeaderClass, .screen6SubHeaderClass, .screen7SubHeaderClass';
 
 //INICIALIZACION
-const initializeCombobox = 'APS3D01';
+const initializeCombobox = 'Statistics_APS3D[1]';
 
 //FUNCION FECHA
 function nowISO(){
@@ -140,16 +140,16 @@ function addComboBox() {
   const select = document.createElement('select');
   select.className = 'comboBoxClass';
   select.innerHTML = `
-    <option value="APS3D01">APS3D01</option>
-    <option value="APS3D02">APS3D02</option>
-    <option value="APS3D03">APS3D03</option>
-    <option value="APS3D04">APS3D04</option>
-    <option value="APS3D05">APS3D05</option>
-    <option value="APS3D06">APS3D06</option>
-    <option value="APS3D07">APS3D07</option>
-    <option value="APS3D08">APS3D08</option>
-    <option value="APS3D09">APS3D09</option>
-    <option value="APS3D10">APS3D10</option>
+    <option value="Statistics_APS3D[1]">APS3D01</option>
+    <option value="Statistics_APS3D[2]">APS3D02</option>
+    <option value="Statistics_APS3D[3]">APS3D03</option>
+    <option value="Statistics_APS3D[4]">APS3D04</option>
+    <option value="Statistics_APS3D[5]">APS3D05</option>
+    <option value="Statistics_APS3D[6]">APS3D06</option>
+    <option value="Statistics_APS3D[7]">APS3D07</option>
+    <option value="Statistics_APS3D[8]">APS3D08</option>
+    <option value="Statistics_APS3D[9]">APS3D09</option>
+    <option value="Statistics_APS3D[10]">APS3D10</option>
   `;
   label.appendChild(select);
   return label;
