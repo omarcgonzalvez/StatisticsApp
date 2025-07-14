@@ -119,27 +119,67 @@ export function addContainer (text) {
   };
   
   /* 1‑b   Recoge máquina y fechas de la UI (si existen) */
-  function collectParams (screenPrefix) {
+  function collectParams(screenPrefix) {
     const root = document.getElementById(`${screenPrefix}Id`);
     if (!root) return {};
-  
+
     const q = {};
     const sel = root.querySelector('.comboBoxClass');
-    if (sel)  q.maquina = sel.value;
-  
-    const start = root.querySelector('[data-role="start"]')?.value;
-    const end   = root.querySelector('[data-role="end"]')?.value;
-    screenPrefix
+    if (sel) {
+      q.maquina = sel.value;
 
-    if (start) q.from = start;
-    if (end)   q.to   = end;
-
-    //Si no hay ni start ni end significa que hay fecha simple
-    if (!start && !end){
-      const singleDate = root.querySelector('input.datetimeInputClass[type="datetime-local"]')?.value;
-      if (singleDate) q.fecha = singleDate;
+      // Verifica si el listener ya está registrado
+      if (!sel.dataset.listenerAdded) {
+        sel.addEventListener('change', () => {
+          loadData(screenPrefix).then(data => renderScreen(screenPrefix, data));
+        });
+        sel.dataset.listenerAdded = true; // Marca el listener como agregado
+      }
     }
-    
+
+    const start = root.querySelector('[data-role="start"]');
+    const end = root.querySelector('[data-role="end"]');
+
+    if (start) {
+      q.from = start.value;
+
+      // Verifica si el listener ya está registrado
+      if (!start.dataset.listenerAdded) {
+        start.addEventListener('change', () => {
+          loadData(screenPrefix).then(data => renderScreen(screenPrefix, data));
+        });
+        start.dataset.listenerAdded = true; // Marca el listener como agregado
+      }
+    }
+
+    if (end) {
+      q.to = end.value;
+
+      // Verifica si el listener ya está registrado
+      if (!end.dataset.listenerAdded) {
+        end.addEventListener('change', () => {
+          loadData(screenPrefix).then(data => renderScreen(screenPrefix, data));
+        });
+        end.dataset.listenerAdded = true; // Marca el listener como agregado
+      }
+    }
+
+    // Si no hay ni start ni end, busca fecha simple
+    if (!start && !end) {
+      const singleDate = root.querySelector('input.datetimeInputClass[type="datetime-local"]');
+      if (singleDate) {
+        q.fecha = singleDate.value;
+
+        // Verifica si el listener ya está registrado
+        if (!singleDate.dataset.listenerAdded) {
+          singleDate.addEventListener('change', () => {
+            loadData(screenPrefix).then(data => renderScreen(screenPrefix, data));
+          });
+          singleDate.dataset.listenerAdded = true; // Marca el listener como agregado
+        }
+      }
+    }
+
     return q;
   }
   
@@ -383,4 +423,3 @@ export function addContainer (text) {
           'Axis Y Cycles'
       ]);
     }
-  
