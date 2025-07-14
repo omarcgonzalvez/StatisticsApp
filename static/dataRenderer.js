@@ -71,12 +71,52 @@ export function addPieChart(containerId, datos, etiquetas) {
   });
 }
 
-export function addContainer (text) {
-    const div = document.createElement('div');
-    div.className  = 'containerClass';
-    div.textContent = text;
-    return div;
-  }
+export function addContainer ({title, value}) {
+  console.log(`[addContainer] Generando div con:`, {title, value});
+  const div = document.createElement('div');
+  div.className  = 'containerClass';
+  // Si es un objeto no nulo, convertirlo a string JSON (como backup)
+  const safeValue =
+    (typeof value === 'object' && value !== null)
+      ? JSON.stringify(value)
+      : value ?? '—'; // Muestra un guión si es null o undefined
+
+  div.textContent = `${title}: ${safeValue}`;
+  return div;
+}
+
+function normalizeData(data) {
+  return {
+    times: [
+      { title: "TIEMPO DE CARGA BATERIA", value: data.TimeChargingBatt },
+      { title: "AUTO & ORDER", value: data.AutoAndOrder },
+      { title: "AUTO & SEARCH", value: data.AutoAndSearch },
+      { title: "TIME BLOCKED", value: data.Time_Blocked },
+      { title: "TIME IN ERROR", value: data.Time_In_Error }
+    ],
+    orders: [
+      { title: "COMPLETED TASKS", value: data.Tasks_Completed },
+      { title: "CANCELED TASKS", value: data.Canceled_Tasks },
+      { title: "MOVEMENTS COMPLETED", value: data.Movements_Completed },
+      { title: "NUMBER OF ERRORS", value: data.Errors }
+    ],
+    axisMoveTime: [
+      { title: "TIEMPO DESPLAZAMIENTO EJE X", value: data.AXIS_X_MoveTime },
+      { title: "TIEMPO DESPLAZAMIENTO EJE Y", value: data.AXIS_Y_MoveTime },
+      { title: "TIEMPO DESPLAZAMIENTO EJE Z", value: data.AXIS_Z_MoveTime }
+    ],
+    axisDistance: [
+      { title: "DISTANCIA RECORRIDA EJE X", value: data.AXIS_X_Distance },
+      { title: "DISTANCIA RECORRIDA EJE Z", value: data.AXIS_Z_Distance }
+    ],
+    axisCycles: [
+      { title: "CICLOS REALIZADOS EJE X", value: data.AXIS_X_Cycles },
+      { title: "CICLOS REALIZADOS EJE Z", value: data.AXIS_Z_Cycles },
+      { title: "CICLOS REALIZADOS EJE Y", value: data.AXIS_Y_Cycles }
+    ]
+  };
+}
+
   
   const CONTAINER_SUFFIX = {
     times:         'TimesContainer',
@@ -94,15 +134,28 @@ export function addContainer (text) {
   }
   
   export function renderScreen (screenPrefix, data) {
+    console.log(`[renderScreen] Redibujando ${screenPrefix}`);
+    console.log(`[renderScreen] Data:`, data);
+  
     clearContainers(screenPrefix);
   
     Object.entries(CONTAINER_SUFFIX).forEach(([key, suffix]) => {
       const container = document.getElementById(`${screenPrefix}${suffix}`);
-      if (!container || !Array.isArray(data[key])) return;
+      if (!container) {
+        console.warn(`[renderScreen] Contenedor no encontrado: ${screenPrefix}${suffix}`);
+        return;
+      }
+      if (!Array.isArray(data[key])) {
+        console.warn(`[renderScreen] No hay datos para ${key}`, data[key]);
+        return;
+      }
+  
+      console.log(`[renderScreen] Pintando ${data[key].length} elementos en ${key}`);
   
       data[key].forEach(item => container.appendChild(addContainer(item)));
     });
   }
+  
   
   ///////////////////////////////////////////////////////
   // 2.  Config de endpoints y recogida de parámetros  //
@@ -179,7 +232,7 @@ export function addContainer (text) {
         }
       }
     }
-
+    console.log(`[collectParams] ${screenPrefix}:`, q); // Depuración: muestra los parámetros recogidos
     return q;
   }
   
@@ -198,7 +251,9 @@ export function addContainer (text) {
       const rsp = await fetch(`${endpoint}?${qs}`);
       if (!rsp.ok)   throw new Error(`${rsp.status}`);
       const json = await rsp.json();
-      return json;
+      console.log(`[loadData] ${screenPrefix}:`, json); // Depuración: muestra los datos obtenidos
+      const normalizedData = normalizeData(json);
+      return normalizedData;
     } catch (err) {
       console.error(`[dataRenderer] ${endpoint} falló:`, err);
       return fallback;                 // fallback (mock) si algo va mal
