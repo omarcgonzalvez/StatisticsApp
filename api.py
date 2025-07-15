@@ -73,6 +73,7 @@ def segundos_a_hhmmss(segundos):
 
 @app.route('/api/diferencia')
 def api_diferencia():
+    maquina = request.args.get('maquina')  # Nuevo parámetro opcional
     fecha_inicial_str = request.args.get('fecha_inicial')
     fecha_final_str = request.args.get('fecha_final')
 
@@ -95,6 +96,14 @@ def api_diferencia():
     if not diferencias:
         return jsonify({'error': 'No hay datos suficientes para calcular diferencias'}), 404
 
+    # Si se proporciona el parámetro "maquina", devolver solo los datos de esa máquina
+    if maquina:
+        datos_maquina = diferencias.get(maquina)
+        if not datos_maquina:
+            return jsonify({'error': f'No se encontraron datos para la máquina: {maquina}'}), 404
+        return jsonify(datos_maquina)
+
+    # Si no se proporciona "maquina", devolver todos los datos agrupados
     return jsonify(diferencias)
 
 

@@ -195,10 +195,37 @@ document.addEventListener('change', e => {
   );
 
   if (!screen) return;   // por si acaso
-
+  const screenId = screen.id;
   const role   = e.target.dataset.role || 'single';
   console.log(`[${screen.id}] ${role} →`, e.target.value);
+
+  
+  // Actualizar datos y gráficas según la pantalla
+  switch (screenId) {
+    case 'screen2Id':
+      showDataResumen();
+      break;
+    case 'screen3Id':
+      showDataFiltrarPorFecha();
+      break;
+    case 'screen4Id':
+      showDataTotal();
+      break;
+    case 'screen5Id':
+      showDataTotalFiltrar();
+      break;
+    case 'screen6Id':
+      showDataPromedios();
+      break;
+    case 'screen7Id':
+      showDataPromediosFiltrar();
+      break;
+    default:
+      console.warn(`No se encontró una función para actualizar la pantalla: ${screenId}`);
+  }
 });
+
+
 /*  Log de CUALQUIER clic dentro del documento */
 document.addEventListener('click', event => {
   // ¿A qué elemento realmente se hizo clic?
@@ -596,4 +623,42 @@ document.addEventListener('click', e => {
 
   showOnlyScreen(target);  // navega
   paint();                 // pinta datos de destino
+});
+
+/* Escucha cambios en TODOS los .comboBoxClass */
+document.addEventListener('change', e => {
+  if (!e.target.matches('.comboBoxClass')) return;
+
+  const screen = e.target.closest(
+    '.screen2Class, .screen3Class, .screen4Class, .screen5Class, .screen6Class, .screen7Class'
+  );
+
+  if (!screen) return; // por si acaso
+
+  const screenId = screen.id;
+  console.log(`[${screenId}] Combobox →`, e.target.value);
+
+  // Actualizar datos y gráficas según la pantalla
+  switch (screenId) {
+    case 'screen2Id':
+      showDataResumen();
+      break;
+    case 'screen3Id':
+      showDataFiltrarPorFecha();
+      break;
+    case 'screen4Id':
+      showDataTotal();
+      break;
+    case 'screen5Id':
+      showDataTotalFiltrar();
+      break;
+    case 'screen6Id':
+      showDataPromedios();
+      break;
+    case 'screen7Id':
+      showDataPromediosFiltrar();
+      break;
+    default:
+      console.warn(`No se encontró una función para actualizar la pantalla: ${screenId}`);
+  }
 });

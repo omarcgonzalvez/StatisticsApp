@@ -175,63 +175,32 @@ function normalizeData(data) {
   function collectParams(screenPrefix) {
     const root = document.getElementById(`${screenPrefix}Id`);
     if (!root) return {};
-
+  
     const q = {};
     const sel = root.querySelector('.comboBoxClass');
     if (sel) {
       q.maquina = sel.value;
-
-      // Verifica si el listener ya está registrado
-      if (!sel.dataset.listenerAdded) {
-        sel.addEventListener('change', () => {
-          loadData(screenPrefix).then(data => renderScreen(screenPrefix, data));
-        });
-        sel.dataset.listenerAdded = true; // Marca el listener como agregado
-      }
     }
-
+  
     const start = root.querySelector('[data-role="start"]');
     const end = root.querySelector('[data-role="end"]');
-
+  
     if (start) {
       q.fecha_inicial = start.value;
-
-      // Verifica si el listener ya está registrado
-      if (!start.dataset.listenerAdded) {
-        start.addEventListener('change', () => {
-          loadData(screenPrefix).then(data => renderScreen(screenPrefix, data));
-        });
-        start.dataset.listenerAdded = true; // Marca el listener como agregado
-      }
     }
-
+  
     if (end) {
       q.fecha_final = end.value;
-
-      // Verifica si el listener ya está registrado
-      if (!end.dataset.listenerAdded) {
-        end.addEventListener('change', () => {
-          loadData(screenPrefix).then(data => renderScreen(screenPrefix, data));
-        });
-        end.dataset.listenerAdded = true; // Marca el listener como agregado
-      }
     }
-
+  
     // Si no hay ni start ni end, busca fecha simple
     if (!start && !end) {
       const singleDate = root.querySelector('input.datetimeInputClass[type="datetime-local"]');
       if (singleDate) {
         q.fecha = singleDate.value;
-
-        // Verifica si el listener ya está registrado
-        if (!singleDate.dataset.listenerAdded) {
-          singleDate.addEventListener('change', () => {
-            loadData(screenPrefix).then(data => renderScreen(screenPrefix, data));
-          });
-          singleDate.dataset.listenerAdded = true; // Marca el listener como agregado
-        }
       }
     }
+  
     console.log(`[collectParams] ${screenPrefix}:`, q); // Depuración: muestra los parámetros recogidos
     return q;
   }
@@ -279,204 +248,77 @@ function normalizeData(data) {
   /////////////////////////////////////////////
   // 5.  showData «finas»                    //
   /////////////////////////////////////////////
-  
-  export async function showDataResumen          () { const data = await loadData('screen2', dummyData('screen2'));  renderScreen('screen2', data); 
-    addPieChart('screen2TimesContainer', [datos1, datos2, datos3, datos4, datos5], [
-    'TimeChargingBatt',
-    'AutoAndSearch',
-    'AutoAndOrder',
-    'Time_Blocked',
-    'Time_In_Error'
-    ]);
-    console.log('[DEBUGGGGGDEBUGGGGGDEBUGGGG] orders:', data.orders.map(o => o.value));
+  const titleArray = {
+    times: ['TimeChargingBatt', 'AutoAndSearch', 'AutoAndOrder', 'Time_Blocked', 'Time_In_Error'],
+    orders: ['Tasks_Completed', 'Canceled_Tasks', 'Movements_Completed', 'Errors'],
+    axisMoveTime: ['AXIS_X_MoveTime', 'AXIS_Z_MoveTime', 'AXIS_Y_MoveTime'],
+    axisDistance: ['AXIS_X_Distance', 'AXIS_Z_Distance'],
+    axisCycles: ['AXIS_X_Cycles', 'AXIS_Z_Cycles', 'AXIS_Y_Cycles']
+  };
 
-    addPieChart('screen2OrdersContainer', [100, 100, 100], 
-      [
-        'Completed Tasks',
-        'Canceled Tasks',
-        'Movements Completed',
-        'Number of Errors'
-    ]);
-    addPieChart('screen2AxisMoveTimeContainer', [100, 100, 100], 
-      [
-        'Axis X Movetime',
-        'Axis Z Movetime',
-        'Axis Y Movetime'
-    ]);
-    addPieChart('screen2AxisDistanceContainer', [100, 200], 
-      [
-        'Axis X Distance',
-        'Axis Z Distance'
-    ]);
-    addPieChart('screen2AxisCyclesContainer', [100, 200, 300], 
-      [
-        'Axis X Cycles',
-        'Axis Z Cycles',
-        'Axis Y Cycles'
-    ]);
+  export async function showDataResumen() {
+    const data = await loadData('screen2', dummyData('screen2')); // Carga los datos reales o ficticios
+    renderScreen('screen2', data); // Actualiza los contenedores
+  
+    // Actualizar las gráficas redondas con datos reales
+    addPieChart('screen2TimesContainer', data.times.map(t => t.value), titleArray.times);//data.times.map(t => t.title));
+    addPieChart('screen2OrdersContainer', data.orders.map(o => o.value), titleArray.orders);//data.orders.map(o => o.title));
+    addPieChart('screen2AxisMoveTimeContainer', data.axisMoveTime.map(a => a.value), titleArray.axisMoveTime);//data.axisMoveTime.map(a => a.title));
+    addPieChart('screen2AxisDistanceContainer', data.axisDistance.map(a => a.value), titleArray.axisDistance);//data.axisDistance.map(a => a.title));
+    addPieChart('screen2AxisCyclesContainer', data.axisCycles.map(a => a.value), titleArray.axisCycles);//data.axisCycles.map(a => a.title));
   }
-  export async function showDataFiltrarPorFecha  () { const data = await loadData('screen3', dummyData('screen3'));  renderScreen('screen3', data); 
-    addPieChart('screen3TimesContainer', [datos1, datos2, datos3, datos4, datos5], [
-      'TimeChargingBatt',
-      'AutoAndSearch',
-      'AutoAndOrder',
-      'Time_Blocked',
-      'Time_In_Error'
-      ]);
-      addPieChart('screen3OrdersContainer', [100, 100, 100, 100], 
-        [
-          'Completed Tasks',
-          'Canceled Tasks',
-          'Movements Completed',
-          'Number of Errors'
-      ]);
-      addPieChart('screen3AxisMoveTimeContainer', [100, 100, 100], 
-        [
-          'Axis X Movetime',
-          'Axis Z Movetime',
-          'Axis Y Movetime'
-      ]);
-      addPieChart('screen3AxisDistanceContainer', [100, 200], 
-        [
-          'Axis X Distance',
-          'Axis Z Distance'
-      ]);
-      addPieChart('screen3AxisCyclesContainer', [100, 200, 300], 
-        [
-          'Axis X Cycles',
-          'Axis Z Cycles',
-          'Axis Y Cycles'
-      ]);
-    }
-  export async function showDataTotal            () { const data = await loadData('screen4', dummyData('screen4'));  renderScreen('screen4', data); 
-    addPieChart('screen4TimesContainer', [datos1, datos2, datos3, datos4, datos5], [
-      'TimeChargingBatt',
-      'AutoAndSearch',
-      'AutoAndOrder',
-      'Time_Blocked',
-      'Time_In_Error'
-      ]);
-      addPieChart('screen4OrdersContainer', [100, 100, 100, 100], 
-        [
-          'Completed Tasks',
-          'Canceled Tasks',
-          'Movements Completed',
-          'Number of Errors'
-      ]);
-      addPieChart('screen4AxisMoveTimeContainer', [100, 100, 100], 
-        [
-          'Axis X Movetime',
-          'Axis Z Movetime',
-          'Axis Y Movetime'
-      ]);
-      addPieChart('screen4AxisDistanceContainer', [100, 200], 
-        [
-          'Axis X Distance',
-          'Axis Z Distance'
-      ]);
-      addPieChart('screen4AxisCyclesContainer', [100, 200, 300], 
-        [
-          'Axis X Cycles',
-          'Axis Z Cycles',
-          'Axis Y Cycles'
-      ]);
-    }
-  export async function showDataTotalFiltrar     () { const data = await loadData('screen5', dummyData('screen5'));  renderScreen('screen5', data); 
-    addPieChart('screen5TimesContainer', [datos1, datos2, datos3, datos4, datos5], [
-      'TimeChargingBatt',
-      'AutoAndSearch',
-      'AutoAndOrder',
-      'Time_Blocked',
-      'Time_In_Error'
-      ]);
-      addPieChart('screen5OrdersContainer', [100, 100, 100, 100], 
-        [
-          'Completed Tasks',
-          'Canceled Tasks',
-          'Movements Completed',
-          'Number of Errors'
-      ]);
-      addPieChart('screen5AxisMoveTimeContainer', [100, 100, 100], 
-        [
-          'Axis X Movetime',
-          'Axis Z Movetime',
-          'Axis Y Movetime'
-      ]);
-      addPieChart('screen5AxisDistanceContainer', [100, 200], 
-        [
-          'Axis X Distance',
-          'Axis Z Distance'
-      ]);
-      addPieChart('screen5AxisCyclesContainer', [100, 200, 300], 
-        [
-          'Axis X Cycles',
-          'Axis Z Cycles',
-          'Axis Y Cycles'
-      ]);
-    }
-  export async function showDataPromedios        () { const data = await loadData('screen6', dummyData('screen6'));  renderScreen('screen6', data); 
-    addPieChart('screen6TimesContainer', [datos1, datos2, datos3, datos4, datos5], [
-      'TimeChargingBatt',
-      'AutoAndSearch',
-      'AutoAndOrder',
-      'Time_Blocked',
-      'Time_In_Error'
-      ]);
-      addPieChart('screen6OrdersContainer', [100, 100, 100, 100], 
-        [
-          'Completed Tasks',
-          'Canceled Tasks',
-          'Movements Completed',
-          'Number of Errors'
-      ]);
-      addPieChart('screen6AxisMoveTimeContainer', [100, 100, 100], 
-        [
-          'Axis X Movetime',
-          'Axis Z Movetime',
-          'Axis Y Movetime'
-      ]);
-      addPieChart('screen6AxisDistanceContainer', [100, 200], 
-        [
-          'Axis X Distance',
-          'Axis Z Distance'
-      ]);
-      addPieChart('screen6AxisCyclesContainer', [100, 200, 300], 
-        [
-          'Axis X Cycles',
-          'Axis Z Cycles',
-          'Axis Y Cycles'
-      ]);
-    }
-  export async function showDataPromediosFiltrar () { const data = await loadData('screen7', dummyData('screen7'));  renderScreen('screen7', data); 
-    addPieChart('screen7TimesContainer', [datos1, datos2, datos3, datos4, datos5], [
-      'TimeChargingBatt',
-      'AutoAndSearch',
-      'AutoAndOrder',
-      'Time_Blocked',
-      'Time_In_Error'
-      ]);
-      addPieChart('screen7OrdersContainer', [100, 100, 100, 100], 
-        [
-          'Completed Tasks',
-          'Canceled Tasks',
-          'Movements Completed',
-          'Number of Errors'
-      ]);
-      addPieChart('screen7AxisMoveTimeContainer', [100, 100, 100], 
-        [
-          'Axis X Movetime',
-          'Axis Z Movetime',
-          'Axis Y Movetime'
-      ]);
-      addPieChart('screen7AxisDistanceContainer', [100, 200], 
-        [
-          'Axis X Distance',
-          'Axis Z Distance'
-      ]);
-      addPieChart('screen7AxisCyclesContainer', [100, 200, 300], 
-        [
-          'Axis X Cycles',
-          'Axis Z Cycles',
-          'Axis Y Cycles'
-      ]);
-    }
+  
+  export async function showDataFiltrarPorFecha() {
+    const data = await loadData('screen3', dummyData('screen3'));
+    renderScreen('screen3', data);
+  
+    addPieChart('screen3TimesContainer', data.times.map(t => t.value), titleArray.times);//data.times.map(t => t.title));
+    addPieChart('screen3OrdersContainer', data.orders.map(o => o.value), titleArray.orders);//data.orders.map(o => o.title));
+    addPieChart('screen3AxisMoveTimeContainer', data.axisMoveTime.map(a => a.value), titleArray.axisMoveTime);//data.axisMoveTime.map(a => a.title));
+    addPieChart('screen3AxisDistanceContainer', data.axisDistance.map(a => a.value), titleArray.axisDistance);//data.axisDistance.map(a => a.title));
+    addPieChart('screen3AxisCyclesContainer', data.axisCycles.map(a => a.value), titleArray.axisCycles);//data.axisCycles.map(a => a.title));
+  }
+  
+  export async function showDataTotal() {
+    const data = await loadData('screen4', dummyData('screen4'));
+    renderScreen('screen4', data);
+  
+    addPieChart('screen4TimesContainer', data.times.map(t => t.value), titleArray.times);//data.times.map(t => t.title));
+    addPieChart('screen4OrdersContainer', data.orders.map(o => o.value), titleArray.orders);//data.orders.map(o => o.title));
+    addPieChart('screen4AxisMoveTimeContainer', data.axisMoveTime.map(a => a.value), titleArray.axisMoveTime);//data.axisMoveTime.map(a => a.title));
+    addPieChart('screen4AxisDistanceContainer', data.axisDistance.map(a => a.value), titleArray.axisDistance);//data.axisDistance.map(a => a.title));
+    addPieChart('screen4AxisCyclesContainer', data.axisCycles.map(a => a.value), titleArray.axisCycles);//data.axisCycles.map(a => a.title));
+  }
+  
+  export async function showDataTotalFiltrar() {
+    const data = await loadData('screen5', dummyData('screen5'));
+    renderScreen('screen5', data);
+  
+    addPieChart('screen5TimesContainer', data.times.map(t => t.value), titleArray.times);//data.times.map(t => t.title));
+    addPieChart('screen5OrdersContainer', data.orders.map(o => o.value), titleArray.orders);//data.orders.map(o => o.title));
+    addPieChart('screen5AxisMoveTimeContainer', data.axisMoveTime.map(a => a.value), titleArray.axisMoveTime);//data.axisMoveTime.map(a => a.title));
+    addPieChart('screen5AxisDistanceContainer', data.axisDistance.map(a => a.value), titleArray.axisDistance);//data.axisDistance.map(a => a.title));
+    addPieChart('screen5AxisCyclesContainer', data.axisCycles.map(a => a.value), titleArray.axisCycles);//data.axisCycles.map(a => a.title));
+  }
+  
+  export async function showDataPromedios() {
+    const data = await loadData('screen6', dummyData('screen6'));
+    renderScreen('screen6', data);
+  
+    addPieChart('screen6TimesContainer', data.times.map(t => t.value), titleArray.times);//data.times.map(t => t.title));
+    addPieChart('screen6OrdersContainer', data.orders.map(o => o.value), titleArray.orders);//data.orders.map(o => o.title));
+    addPieChart('screen6AxisMoveTimeContainer', data.axisMoveTime.map(a => a.value), titleArray.axisMoveTime);//data.axisMoveTime.map(a => a.title));
+    addPieChart('screen6AxisDistanceContainer', data.axisDistance.map(a => a.value), titleArray.axisDistance);//data.axisDistance.map(a => a.title));
+    addPieChart('screen6AxisCyclesContainer', data.axisCycles.map(a => a.value), titleArray.axisCycles);//data.axisCycles.map(a => a.title));
+  }
+  
+  export async function showDataPromediosFiltrar() {
+    const data = await loadData('screen7', dummyData('screen7'));
+    renderScreen('screen7', data);
+  
+    addPieChart('screen7TimesContainer', data.times.map(t => t.value), titleArray.times);//data.times.map(t => t.title));
+    addPieChart('screen7OrdersContainer', data.orders.map(o => o.value), );//data.orders.map(o => o.title));
+    addPieChart('screen7AxisMoveTimeContainer', data.axisMoveTime.map(a => a.value), titleArray.axisMoveTime);//data.axisMoveTime.map(a => a.title));
+    addPieChart('screen7AxisDistanceContainer', data.axisDistance.map(a => a.value), titleArray.axisDistance);//data.axisDistance.map(a => a.title));
+    addPieChart('screen7AxisCyclesContainer', data.axisCycles.map(a => a.value), titleArray.axisCycles);//data.axisCycles.map(a => a.title));
+  }
