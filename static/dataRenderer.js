@@ -235,23 +235,30 @@ function normalizeData(data) {
   // 3.  Capa de acceso a datos                        //
   ///////////////////////////////////////////////////////
   
-  async function loadData (screenPrefix, fallback = {}) {
+  async function loadData(screenPrefix, fallback = {}) {
     const endpoint = ENDPOINTS[screenPrefix];
     if (!endpoint) return fallback;
   
     const params = collectParams(screenPrefix);
-    const qs     = new URLSearchParams(params).toString();
+    const qs = new URLSearchParams(params).toString();
   
     try {
       const rsp = await fetch(`${endpoint}?${qs}`);
-      if (!rsp.ok)   throw new Error(`${rsp.status}`);
+      if (!rsp.ok) {
+        if (rsp.status === 400) {
+          alert("HTTP Request Error 400 (BAD REQUEST): The request is invalid. Please check the input data and try again.");
+        } else if (rsp.status === 404) {
+          alert("HTTP Request Error 404 (NOT FOUND): No data found for the given request.");
+        }
+        throw new Error(`${rsp.status}`);
+      }
       const json = await rsp.json();
       console.log(`[loadData] ${screenPrefix}:`, json); // Depuración: muestra los datos obtenidos
       const normalizedData = normalizeData(json);
       return normalizedData;
     } catch (err) {
-      console.error(`[dataRenderer] ${endpoint} falló:`, err);
-      return fallback;                 // fallback (mock) si algo va mal
+      console.error(`[dataRenderer] ${endpoint} falló:`, err);
+      return fallback; // fallback (mock) si algo va mal
     }
   }
   
