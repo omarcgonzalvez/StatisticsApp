@@ -19,9 +19,10 @@ export function addPieChart(containerId, datos, etiquetas) {
     console.warn(`Contenedor con id ${containerId} no encontrado`);
     return;
   }
-  //LIMPIEZA PREVIA DE CANVAS NO DESEADOS
+
+  // Limpieza previa de canvas no deseados
   contenedor.querySelectorAll('canvas.pieChartClass, .pieChartClass-legend')
-  .forEach(el => el.remove());
+    .forEach(el => el.remove());
 
   // Crear un canvas para la gráfica
   const canvas = document.createElement('canvas');
@@ -30,8 +31,8 @@ export function addPieChart(containerId, datos, etiquetas) {
   canvas.height = 330;
   canvas.id = containerId + '-pieChartClass';
 
-  // ①  Añádelo **dentro** del contenedor, al final de la columna
-  contenedor.appendChild(canvas);      // <─ cambio aquí
+  // Añádelo dentro del contenedor
+  contenedor.appendChild(canvas);
 
   // Crear la gráfica
   const ctx = canvas.getContext('2d');
@@ -63,12 +64,30 @@ export function addPieChart(containerId, datos, etiquetas) {
           }
         },
         tooltip: {
+          titleFont: {
+            size: 16, // Tamaño de la fuente del título
+            weight: 'bold' // Negrita para el título
+          },
+          bodyFont: {
+            size: 16, // Tamaño de la fuente del cuerpo
+            weight: 'bold' // Negrita para el cuerpo
+          },
+          padding: 10, // Espaciado interno del tooltip
+          boxPadding: 5, // Espaciado adicional alrededor del tooltip
           callbacks: {
             label: function(tooltipItem) {
               const dataset = tooltipItem.dataset;
               const total = dataset.data.reduce((acc, val) => acc + val, 0);
               const value = dataset.data[tooltipItem.dataIndex];
               const porcentaje = ((value / total) * 100).toFixed(2);
+
+              // Si el contenedor es de tiempos, mostrar en formato HH:MM:SS
+              if (containerId.includes('TimesContainer') || containerId.includes('AxisMoveTimeContainer')) {
+                const tiempoHHMMSS = convertirSegundosAHHMMSS(value);
+                return `${tiempoHHMMSS} (${porcentaje}%)`;
+              }
+
+              // Para otros contenedores, mostrar el valor original
               return `${value} (${porcentaje}%)`;
             }
           }
@@ -263,69 +282,88 @@ function normalizeData(data) {
     axisCycles: ['AXIS_X_Cycles', 'AXIS_Z_Cycles', 'AXIS_Y_Cycles']
   };
 
+  function convertirATiempoEnSegundos(hhmmss) {
+    if (typeof hhmmss !== 'string' || !hhmmss.includes(':')) return 0;
+  
+    const [horas, minutos, segundos] = hhmmss.split(':').map(Number);
+    return (horas * 3600) + (minutos * 60) + segundos;
+  }
+
+  function convertirSegundosAHHMMSS(segundos) {
+    const horas = Math.floor(segundos / 3600);
+    const minutos = Math.floor((segundos % 3600) / 60);
+    const segundosRestantes = segundos % 60;
+    return `${horas.toString().padStart(2, '0')}:${minutos.toString().padStart(2, '0')}:${segundosRestantes.toString().padStart(2, '0')}`;
+  }
+  
   export async function showDataResumen() {
     const data = await loadData('screen2', dummyData('screen2')); // Carga los datos reales o ficticios
     renderScreen('screen2', data); // Actualiza los contenedores
-  
-    // Actualizar las gráficas redondas con datos reales
-    addPieChart('screen2TimesContainer', data.times.map(t => t.value), titleArray.times);//data.times.map(t => t.title));
-    addPieChart('screen2OrdersContainer', data.orders.map(o => o.value), titleArray.orders);//data.orders.map(o => o.title));
-    addPieChart('screen2AxisMoveTimeContainer', data.axisMoveTime.map(a => a.value), titleArray.axisMoveTime);//data.axisMoveTime.map(a => a.title));
-    addPieChart('screen2AxisDistanceContainer', data.axisDistance.map(a => a.value), titleArray.axisDistance);//data.axisDistance.map(a => a.title));
-    addPieChart('screen2AxisCyclesContainer', data.axisCycles.map(a => a.value), titleArray.axisCycles);//data.axisCycles.map(a => a.title));
+
+
+    addPieChart('screen2TimesContainer', data.times.map(t => convertirATiempoEnSegundos(t.value)), titleArray.times );
+    addPieChart('screen2OrdersContainer', data.orders.map(o => o.value), titleArray.orders);
+    addPieChart('screen2AxisMoveTimeContainer', data.axisMoveTime.map(t => convertirATiempoEnSegundos(t.value)), titleArray.axisMoveTime);
+    addPieChart('screen2AxisDistanceContainer', data.axisDistance.map(a => a.value), titleArray.axisDistance);
+    addPieChart('screen2AxisCyclesContainer', data.axisCycles.map(a => a.value), titleArray.axisCycles);
   }
   
   export async function showDataFiltrarPorFecha() {
     const data = await loadData('screen3', dummyData('screen3'));
     renderScreen('screen3', data);
   
-    addPieChart('screen3TimesContainer', data.times.map(t => t.value), titleArray.times);//data.times.map(t => t.title));
-    addPieChart('screen3OrdersContainer', data.orders.map(o => o.value), titleArray.orders);//data.orders.map(o => o.title));
-    addPieChart('screen3AxisMoveTimeContainer', data.axisMoveTime.map(a => a.value), titleArray.axisMoveTime);//data.axisMoveTime.map(a => a.title));
-    addPieChart('screen3AxisDistanceContainer', data.axisDistance.map(a => a.value), titleArray.axisDistance);//data.axisDistance.map(a => a.title));
-    addPieChart('screen3AxisCyclesContainer', data.axisCycles.map(a => a.value), titleArray.axisCycles);//data.axisCycles.map(a => a.title));
+
+    addPieChart('screen3TimesContainer', data.times.map(t => convertirATiempoEnSegundos(t.value)), titleArray.times );
+    addPieChart('screen3OrdersContainer', data.orders.map(o => o.value), titleArray.orders);
+    addPieChart('screen3AxisMoveTimeContainer', data.axisMoveTime.map(t => convertirATiempoEnSegundos(t.value)), titleArray.axisMoveTime);
+    addPieChart('screen3AxisDistanceContainer', data.axisDistance.map(a => a.value), titleArray.axisDistance);
+    addPieChart('screen3AxisCyclesContainer', data.axisCycles.map(a => a.value), titleArray.axisCycles);
   }
   
   export async function showDataTotal() {
     const data = await loadData('screen4', dummyData('screen4'));
     renderScreen('screen4', data);
   
-    addPieChart('screen4TimesContainer', data.times.map(t => t.value), titleArray.times);//data.times.map(t => t.title));
-    addPieChart('screen4OrdersContainer', data.orders.map(o => o.value), titleArray.orders);//data.orders.map(o => o.title));
-    addPieChart('screen4AxisMoveTimeContainer', data.axisMoveTime.map(a => a.value), titleArray.axisMoveTime);//data.axisMoveTime.map(a => a.title));
-    addPieChart('screen4AxisDistanceContainer', data.axisDistance.map(a => a.value), titleArray.axisDistance);//data.axisDistance.map(a => a.title));
-    addPieChart('screen4AxisCyclesContainer', data.axisCycles.map(a => a.value), titleArray.axisCycles);//data.axisCycles.map(a => a.title));
+
+    addPieChart('screen4TimesContainer', data.times.map(t => convertirATiempoEnSegundos(t.value)), titleArray.times );
+    addPieChart('screen4OrdersContainer', data.orders.map(o => o.value), titleArray.orders);
+    addPieChart('screen4AxisMoveTimeContainer', data.axisMoveTime.map(t => convertirATiempoEnSegundos(t.value)), titleArray.axisMoveTime);
+    addPieChart('screen4AxisDistanceContainer', data.axisDistance.map(a => a.value), titleArray.axisDistance);
+    addPieChart('screen4AxisCyclesContainer', data.axisCycles.map(a => a.value), titleArray.axisCycles);
   }
   
   export async function showDataTotalFiltrar() {
     const data = await loadData('screen5', dummyData('screen5'));
     renderScreen('screen5', data);
   
-    addPieChart('screen5TimesContainer', data.times.map(t => t.value), titleArray.times);//data.times.map(t => t.title));
-    addPieChart('screen5OrdersContainer', data.orders.map(o => o.value), titleArray.orders);//data.orders.map(o => o.title));
-    addPieChart('screen5AxisMoveTimeContainer', data.axisMoveTime.map(a => a.value), titleArray.axisMoveTime);//data.axisMoveTime.map(a => a.title));
-    addPieChart('screen5AxisDistanceContainer', data.axisDistance.map(a => a.value), titleArray.axisDistance);//data.axisDistance.map(a => a.title));
-    addPieChart('screen5AxisCyclesContainer', data.axisCycles.map(a => a.value), titleArray.axisCycles);//data.axisCycles.map(a => a.title));
+
+    addPieChart('screen5TimesContainer', data.times.map(t => convertirATiempoEnSegundos(t.value)), titleArray.times );
+    addPieChart('screen5OrdersContainer', data.orders.map(o => o.value), titleArray.orders);
+    addPieChart('screen5AxisMoveTimeContainer', data.axisMoveTime.map(t => convertirATiempoEnSegundos(t.value)), titleArray.axisMoveTime);
+    addPieChart('screen5AxisDistanceContainer', data.axisDistance.map(a => a.value), titleArray.axisDistance);
+    addPieChart('screen5AxisCyclesContainer', data.axisCycles.map(a => a.value), titleArray.axisCycles);
   }
   
   export async function showDataPromedios() {
     const data = await loadData('screen6', dummyData('screen6'));
     renderScreen('screen6', data);
   
-    addPieChart('screen6TimesContainer', data.times.map(t => t.value), titleArray.times);//data.times.map(t => t.title));
-    addPieChart('screen6OrdersContainer', data.orders.map(o => o.value), titleArray.orders);//data.orders.map(o => o.title));
-    addPieChart('screen6AxisMoveTimeContainer', data.axisMoveTime.map(a => a.value), titleArray.axisMoveTime);//data.axisMoveTime.map(a => a.title));
-    addPieChart('screen6AxisDistanceContainer', data.axisDistance.map(a => a.value), titleArray.axisDistance);//data.axisDistance.map(a => a.title));
-    addPieChart('screen6AxisCyclesContainer', data.axisCycles.map(a => a.value), titleArray.axisCycles);//data.axisCycles.map(a => a.title));
+
+    addPieChart('screen6TimesContainer', data.times.map(t => convertirATiempoEnSegundos(t.value)), titleArray.times );
+    addPieChart('screen6OrdersContainer', data.orders.map(o => o.value), titleArray.orders);
+    addPieChart('screen6AxisMoveTimeContainer', data.axisMoveTime.map(t => convertirATiempoEnSegundos(t.value)), titleArray.axisMoveTime);
+    addPieChart('screen6AxisDistanceContainer', data.axisDistance.map(a => a.value), titleArray.axisDistance);
+    addPieChart('screen6AxisCyclesContainer', data.axisCycles.map(a => a.value), titleArray.axisCycles);
   }
   
   export async function showDataPromediosFiltrar() {
     const data = await loadData('screen7', dummyData('screen7'));
     renderScreen('screen7', data);
   
-    addPieChart('screen7TimesContainer', data.times.map(t => t.value), titleArray.times);//data.times.map(t => t.title));
-    addPieChart('screen7OrdersContainer', data.orders.map(o => o.value), );//data.orders.map(o => o.title));
-    addPieChart('screen7AxisMoveTimeContainer', data.axisMoveTime.map(a => a.value), titleArray.axisMoveTime);//data.axisMoveTime.map(a => a.title));
-    addPieChart('screen7AxisDistanceContainer', data.axisDistance.map(a => a.value), titleArray.axisDistance);//data.axisDistance.map(a => a.title));
-    addPieChart('screen7AxisCyclesContainer', data.axisCycles.map(a => a.value), titleArray.axisCycles);//data.axisCycles.map(a => a.title));
+
+    addPieChart('screen7TimesContainer', data.times.map(t => convertirATiempoEnSegundos(t.value)), titleArray.times );
+    addPieChart('screen7OrdersContainer', data.orders.map(o => o.value), titleArray.orders);
+    addPieChart('screen7AxisMoveTimeContainer', data.axisMoveTime.map(t => convertirATiempoEnSegundos(t.value)), titleArray.axisMoveTime);
+    addPieChart('screen7AxisDistanceContainer', data.axisDistance.map(a => a.value), titleArray.axisDistance);
+    addPieChart('screen7AxisCyclesContainer', data.axisCycles.map(a => a.value), titleArray.axisCycles);
   }
