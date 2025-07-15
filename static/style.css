@@ -223,7 +223,7 @@
   font: 500 16px/1 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: #1a1a1a;
   text-align: center;
-  width: 200px;
+  width: 230px; /*ANCHO DE COLUMNAS*/
   margin-bottom: 12px;  /* para que no queden pegados */
   user-select: none;    /* no seleccionable */
   transition: none;     /* sin animaciones para info */
