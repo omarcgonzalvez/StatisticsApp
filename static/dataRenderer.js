@@ -38,9 +38,9 @@ export function addPieChart(containerId, datos, etiquetas) {
   new Chart(ctx, {
     type: 'pie',
     data: {
-      labels: etiquetas,
+      labels: etiquetas, // Etiquetas originales
       datasets: [{
-        data: datos,
+        data: datos, // Datos numéricos
         backgroundColor: [
           '#4e73df',
           '#1cc88a',
@@ -54,17 +54,24 @@ export function addPieChart(containerId, datos, etiquetas) {
     options: {
       responsive: false,
       plugins: {
-        legend: { display: true, 
-                  align: 'start',
-                  labels  : {
-                    boxWidth : 25,
-                    //padding  : 20,
-                    font:{size:15}
-                    }
+        legend: {
+          display: true,
+          align: 'start',
+          labels: {
+            boxWidth: 25,
+            font: { size: 15 }
+          }
         },
-        tooltip:{
-          titleFont: { size: 15 }, // título (si lo hay)
-          bodyFont : { size: 15 }  // texto principal del tooltip
+        tooltip: {
+          callbacks: {
+            label: function(tooltipItem) {
+              const dataset = tooltipItem.dataset;
+              const total = dataset.data.reduce((acc, val) => acc + val, 0);
+              const value = dataset.data[tooltipItem.dataIndex];
+              const porcentaje = ((value / total) * 100).toFixed(2);
+              return `${value} (${porcentaje}%)`;
+            }
+          }
         }
       }
     }
