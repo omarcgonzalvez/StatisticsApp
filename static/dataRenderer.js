@@ -191,7 +191,7 @@ function normalizeData(data) {
   const ENDPOINTS = {
     screen2: '/api/datos',
     screen3: '/api/diferencia',
-    screen4: '/api/datos_por_fecha',
+    screen4: '/api/totales_por_fecha',
     screen5: '/api/diferencia',
     screen6: '/api/datos_por_fecha',
     screen7: '/api/diferencia',

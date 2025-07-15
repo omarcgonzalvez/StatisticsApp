@@ -46,8 +46,36 @@ def api_datos_por_fecha():
     datos_por_maquina = {row['DeviceName']: row for row in filas}
     return jsonify(datos_por_maquina)
 
+#############################
+#### API TOTALES POR FECHA ## DEVUELVE LOS DATOS SUMADOS EN UNA FECHA (1 SOLO JSON)
+#############################
+@app.route('/api/totales_por_fecha')
+def api_totales_por_fecha():
+    fecha = request.args.get('fecha')
+    if not fecha:
+        return jsonify({'error': 'Parámetro "fecha" requerido'}), 400
 
-# Funciones auxiliares para api_diferencia (puedes mover a utils.py si quieres)
+    filas = obtener_datos_por_fecha(fecha)
+
+    if not filas:
+        return jsonify({'error': 'No se encontraron datos'}), 404
+
+    # Calcular totales sumando los valores de todas las máquinas
+    totales = defaultdict(float)
+    for row in filas:
+        for key, value in row.items():
+            if key != 'DeviceName':  # Excluir el nombre del dispositivo
+                totales[key] += convertir_a_segundos(value) if isinstance(value, str) and ":" in value else float(value)
+
+    # Convertir los valores de tiempo a formato HH:MM:SS
+    for key in totales.keys():
+        if key in {"TimeChargingBatt", "AutoAndSearch", "AutoAndOrder", "Time_Blocked", "Time_In_Error",
+                   "AXIS_X_MoveTime", "AXIS_Y_MoveTime", "AXIS_Z_MoveTime"}:
+            totales[key] = segundos_a_hhmmss(totales[key])
+
+    return jsonify(totales)
+
+# Funciones auxiliares para api_diferencia 
 def convertir_a_segundos(valor):
     if isinstance(valor, str) and ":" in valor:
         try:
@@ -105,7 +133,6 @@ def api_diferencia():
 
     # Si no se proporciona "maquina", devolver todos los datos agrupados
     return jsonify(diferencias)
-
 
 def calcular_diferencias(filas, fecha_ini_dt, fecha_fin_dt):
     from collections import defaultdict
