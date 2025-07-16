@@ -192,7 +192,7 @@ function normalizeData(data) {
     screen2: '/api/datos',
     screen3: '/api/diferencia',
     screen4: '/api/totales_por_fecha',
-    screen5: '/api/diferencia',
+    screen5: '/api/totales_diferencia',
     screen6: '/api/datos_por_fecha',
     screen7: '/api/diferencia',
   };

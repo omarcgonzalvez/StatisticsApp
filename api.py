@@ -96,8 +96,8 @@ def segundos_a_hhmmss(segundos):
     return f"{horas:02}:{minutos:02}:{segundos:02}"
 
 #############################
-#### API DIFERENCIA      #### DEVUELVE YA FILTRADOS TODOS LOS CAMPOS PARA TODAS LAS MAQUINAS 
-############################# ENTRE UNA FECHA INICIAL Y UNA FECHA FINAL. TODOS LOS DATOS ENTRE ESAS FECHAS
+#### API DIFERENCIA      ####    DEVUELVE DATOS FILTRADOS ENTRE 2 FECHAS: SI SE PROPORCIONA "maquina", DEVUELVE SOLO ESA MAQUINA, SINO, DEVUELVE TODAS LAS MAQUINAS
+#############################    1 JSON SI SE PROPORCIONA "maquina", SINO, DEVUELVE UN JSON POR CADA MAQUINA (10)   
 
 @app.route('/api/diferencia')
 def api_diferencia():
@@ -237,3 +237,75 @@ def calcular_diferencias(filas, fecha_ini_dt, fecha_fin_dt):
         diferencias[device] = diferencia
 
     return diferencias
+
+
+#############################
+#### API DIFERENCIA TOTAL  ##  DEVUELVE DATOS FILTRADOS ENTRE 2 FECHAS Y SUMADOS (TOTALES), SIN ENTRADA DE MAQUINA. 1 SOLO JSON
+############################# 
+@app.route('/api/totales_diferencia')
+def api_totales_diferencia():
+    fecha_inicial_str = request.args.get('fecha_inicial')
+    fecha_final_str = request.args.get('fecha_final')
+
+    if not fecha_inicial_str or not fecha_final_str:
+        return jsonify({'error': 'Parámetros requeridos: fecha_inicial y fecha_final'}), 400
+
+    try:
+        fecha_inicial = datetime.fromisoformat(fecha_inicial_str)
+        fecha_final = datetime.fromisoformat(fecha_final_str)
+    except ValueError:
+        return jsonify({'error': 'Formato de fecha inválido. Usa ISO: YYYY-MM-DDTHH:MM'}), 400
+
+    filas = obtener_filas()
+
+    if not filas:
+        return jsonify({'error': 'No se encontraron datos'}), 404
+
+    diferencias = calcular_diferencias(filas, fecha_inicial, fecha_final)
+
+    if not diferencias:
+        return jsonify({'error': 'No hay datos suficientes para calcular diferencias'}), 404
+
+    # Calcular los totales sumando los valores de todas las máquinas
+    totales = defaultdict(float)
+    campos_tiempo = {
+        "TimeChargingBatt", "AutoAndSearch", "AutoAndOrder",
+        "Time_Blocked", "Time_In_Error",
+        "AXIS_X_MoveTime", "AXIS_Y_MoveTime", "AXIS_Z_MoveTime"
+    }
+
+    for device, datos in diferencias.items():
+        for key, value in datos.items():
+            if key in campos_tiempo:
+                totales[key] += convertir_a_segundos(value)
+            else:
+                totales[key] += value
+
+    # Convertir los valores de tiempo a formato HH:MM:SS
+    for key in totales.keys():
+        if key in campos_tiempo:
+            totales[key] = segundos_a_hhmmss(totales[key])
+
+    ## Formatear la respuesta en el formato esperado NO SE UTILIZA DE MOMENTO
+    #respuesta = {
+    #    "AXIS_X_Cycles": totales.get("AXIS_X_Cycles", 0),
+    #    "AXIS_X_Distance": totales.get("AXIS_X_Distance", 0),
+    #    "AXIS_X_MoveTime": totales.get("AXIS_X_MoveTime", "00:00:00"),
+    #    "AXIS_Y_Cycles": totales.get("AXIS_Y_Cycles", 0),
+    #    "AXIS_Y_Distance": totales.get("AXIS_Y_Distance", 0),
+    #    "AXIS_Y_MoveTime": totales.get("AXIS_Y_MoveTime", "00:00:00"),
+    #    "AXIS_Z_Cycles": totales.get("AXIS_Z_Cycles", 0),
+    #    "AXIS_Z_Distance": totales.get("AXIS_Z_Distance", 0),
+    #    "AXIS_Z_MoveTime": totales.get("AXIS_Z_MoveTime", "00:00:00"),
+    #    "AutoAndOrder": totales.get("AutoAndOrder", "00:00:00"),
+    #    "AutoAndSearch": totales.get("AutoAndSearch", "00:00:00"),
+    #    "Canceled_Tasks": totales.get("Canceled_Tasks", 0),
+    #    "Errors": totales.get("Errors", 0),
+    #    "Movements_Completed": totales.get("Movements_Completed", 0),
+    #    "Tasks_Completed": totales.get("Tasks_Completed", 0),
+    #    "TimeChargingBatt": totales.get("TimeChargingBatt", "00:00:00"),
+    #    "Time_Blocked": totales.get("Time_Blocked", "00:00:00"),
+    #    "Time_In_Error": totales.get("Time_In_Error", "00:00:00")
+    #}
+
+    return jsonify(totales)
