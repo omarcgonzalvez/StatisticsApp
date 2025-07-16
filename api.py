@@ -309,3 +309,90 @@ def api_totales_diferencia():
     #}
 
     return jsonify(totales)
+
+######################
+#### API PROMEDIOS  ## DEVUELVE LOS DATOS PROMEDIADOS EN UNA FECHA (1 SOLO JSON)
+######################
+@app.route('/api/promedios_por_fecha')
+def api_promedios_por_fecha():
+    fecha = request.args.get('fecha')
+    num_maquinas = 10  # Número configurable de máquinas
+
+    if not fecha:
+        return jsonify({'error': 'Parámetro "fecha" requerido'}), 400
+
+    filas = obtener_datos_por_fecha(fecha)
+
+    if not filas:
+        return jsonify({'error': 'No se encontraron datos'}), 404
+
+    # Calcular totales sumando los valores de todas las máquinas
+    totales = defaultdict(float)
+    for row in filas:
+        for key, value in row.items():
+            if key != 'DeviceName':  # Excluir el nombre del dispositivo
+                totales[key] += convertir_a_segundos(value) if isinstance(value, str) and ":" in value else float(value)
+
+    # Convertir los valores de tiempo a formato HH:MM:SS y calcular promedios
+    promedios = {}
+    for key in totales.keys():
+        if key in {"TimeChargingBatt", "AutoAndSearch", "AutoAndOrder", "Time_Blocked", "Time_In_Error",
+                   "AXIS_X_MoveTime", "AXIS_Y_MoveTime", "AXIS_Z_MoveTime"}:
+            promedios[key] = segundos_a_hhmmss(totales[key] / num_maquinas)
+        else:
+            promedios[key] = totales[key] / num_maquinas
+
+    return jsonify(promedios)
+
+################################
+#### API PROMEDIOS DIFERENCIA ## DEVUELVE LOS DATOS PROMEDIADOS ENTRE 2 FECHAS (1 SOLO JSON)
+################################
+@app.route('/api/promedios_diferencia')
+def api_promedios_diferencia():
+    fecha_inicial_str = request.args.get('fecha_inicial')
+    fecha_final_str = request.args.get('fecha_final')
+    num_maquinas = 10  # Número configurable de máquinas
+
+    if not fecha_inicial_str or not fecha_final_str:
+        return jsonify({'error': 'Parámetros requeridos: fecha_inicial y fecha_final'}), 400
+
+    try:
+        fecha_inicial = datetime.fromisoformat(fecha_inicial_str)
+        fecha_final = datetime.fromisoformat(fecha_final_str)
+    except ValueError:
+        return jsonify({'error': 'Formato de fecha inválido. Usa ISO: YYYY-MM-DDTHH:MM'}), 400
+
+    filas = obtener_filas()
+
+    if not filas:
+        return jsonify({'error': 'No se encontraron datos'}), 404
+
+    diferencias = calcular_diferencias(filas, fecha_inicial, fecha_final)
+
+    if not diferencias:
+        return jsonify({'error': 'No hay datos suficientes para calcular diferencias'}), 404
+
+    # Calcular los totales sumando los valores de todas las máquinas
+    totales = defaultdict(float)
+    campos_tiempo = {
+        "TimeChargingBatt", "AutoAndSearch", "AutoAndOrder",
+        "Time_Blocked", "Time_In_Error",
+        "AXIS_X_MoveTime", "AXIS_Y_MoveTime", "AXIS_Z_MoveTime"
+    }
+
+    for device, datos in diferencias.items():
+        for key, value in datos.items():
+            if key in campos_tiempo:
+                totales[key] += convertir_a_segundos(value)
+            else:
+                totales[key] += value
+
+    # Convertir los valores de tiempo a formato HH:MM:SS y calcular promedios
+    promedios = {}
+    for key in totales.keys():
+        if key in campos_tiempo:
+            promedios[key] = segundos_a_hhmmss(totales[key] / num_maquinas)
+        else:
+            promedios[key] = totales[key] / num_maquinas
+
+    return jsonify(promedios)

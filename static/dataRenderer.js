@@ -193,8 +193,8 @@ function normalizeData(data) {
     screen3: '/api/diferencia',
     screen4: '/api/totales_por_fecha',
     screen5: '/api/totales_diferencia',
-    screen6: '/api/datos_por_fecha',
-    screen7: '/api/diferencia',
+    screen6: '/api/promedios_por_fecha',
+    screen7: '/api/promedios_diferencia',
   };
   
   /* 1‑b   Recoge máquina y fechas de la UI (si existen) */
