@@ -39,13 +39,17 @@ def leer_un_elemento(db_bytes, offset):     #Función para leer los valores del 
     CanceledTasks = get_dint(db_bytes, offset + 32)
     MovementsCompleted = get_dint(db_bytes, offset + 36)
     TasksCompleted = get_dint(db_bytes, offset + 40)
+    # Nueva variable Temp_Cabinet
+    Temp_Cabinet = get_dint(db_bytes, offset + 44)
+    # Leer los Spare
+    Spare = [get_dint(db_bytes, offset + 48 + i * 4) for i in range(8)]
 
-    Errors = get_int(db_bytes, offset + 44)
+    Errors = get_int(db_bytes, offset + 80)
 
     Engines = {}     # Leer datos específicos por eje (Axis X, Z, Y)
     axis_names = ["AXIS_X", "AXIS_Z", "AXIS_Y"]
     for i in range(3):
-        base = offset + 46 + i * 12     # Cada eje ocupa 12 bytes consecutivos
+        base = offset + 82 + i * 12     # Cada eje ocupa 12 bytes consecutivos
         Cycles = get_dint(db_bytes, base)
         MoveTime = get_udint(db_bytes, base + 4)
         Distance = get_dint(db_bytes, base + 8)
@@ -66,6 +70,8 @@ def leer_un_elemento(db_bytes, offset):     #Función para leer los valores del 
         "Canceled_Tasks": CanceledTasks,
         "Movements_Completed": MovementsCompleted,
         "Tasks_Completed": TasksCompleted,
+        "Temp_Cabinet": Temp_Cabinet,  # Nueva variable
+        "Spare": Spare,             # Lista de valores Spare
         "Errors": Errors,
         "Engines": Engines
     }
@@ -77,7 +83,7 @@ def main(): # MAIN
         try:
             plc.connect('192.168.2.13', 0, 1)   #PLC en IP y rack/slot indicados
             num_elementos = 10   #Numero de APS3D STATISTICS ARRAYS (NUMERO DE APS3D QUE HAY)
-            elemento_size = 82  #TAMAÑO DE ARRAY DE DATOSS
+            elemento_size = 118  #TAMAÑO DE ARRAY DE DATOSS
             total_length = elemento_size * num_elementos    # Total bytes a leer
 
             db_bytes = plc.db_read(86, 0, total_length)     # Leer bloque de bytes desde DB 86, offset 0
