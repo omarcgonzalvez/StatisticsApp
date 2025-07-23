@@ -5,12 +5,13 @@ import {
   showDataTotalFiltrar,
   showDataPromedios,
   showDataPromediosFiltrar,
+  showTemperatureGraph,
 } from './dataRenderer.js';  
 
-const screens = ['screenMain', 'screen2Id', 'screen3Id', 'screen4Id', 'screen5Id', 'screen6Id', 'screen7Id']; //ARRAY DEFINIR VISTAS A UTILIZAR
-const screenClasses = '.screen2Class,.screen3Class,.screen4Class,.screen5Class,.screen6Class,.screen7Class';
-const screenHeaderClasses = '.screen2HeaderClass,.screen3HeaderClass,.screen4HeaderClass,.screen5HeaderClass,.screen6HeaderClass,.screen7HeaderClass'
-const screenSubHeaderClasses = '.screen2SubHeaderClass, .screen3SubHeaderClass, .screen4SubHeaderClass, .screen5SubHeaderClass, .screen6SubHeaderClass, .screen7SubHeaderClass';
+const screens = ['screenMain', 'screen2Id', 'screen3Id', 'screen4Id', 'screen5Id', 'screen6Id', 'screen7Id','screen8Id']; //ARRAY DEFINIR VISTAS A UTILIZAR
+const screenClasses = '.screen2Class,.screen3Class,.screen4Class,.screen5Class,.screen6Class,.screen7Class.screen8Class';
+const screenHeaderClasses = '.screen2HeaderClass,.screen3HeaderClass,.screen4HeaderClass,.screen5HeaderClass,.screen6HeaderClass,.screen7HeaderClass,.screen8HeaderClass'
+const screenSubHeaderClasses = '.screen2SubHeaderClass, .screen3SubHeaderClass, .screen4SubHeaderClass, .screen5SubHeaderClass, .screen6SubHeaderClass, .screen7SubHeaderClass, .screen8SubHeaderClass';
 
 //INICIALIZACION
 const initializeCombobox = 'Statistics_APS3D[1]';
@@ -128,6 +129,7 @@ OnClick('btnTotal',  ()=>  {showOnlyScreen('screen4Id'); showDataTotal(); });
 OnClick('btnTotalFiltrar',  ()=>  {showOnlyScreen('screen5Id'); showDataTotalFiltrar(); });
 OnClick('btnPromedios',  ()=>  {showOnlyScreen('screen6Id'); showDataPromedios(); });
 OnClick('btnPromediosFiltrar',  ()=>  {showOnlyScreen('screen7Id'); showDataPromediosFiltrar(); });
+OnClick('btnTemperaturas',  ()=>  {showOnlyScreen('screen8Id'); showTemperatureGraph(); });
 OnClick('btnInicio',  ()=>  showOnlyScreen('screenMain'));
 
 
@@ -276,7 +278,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const withComboBox =
       screen.classList.contains('screen2Class') ||
-      screen.classList.contains('screen3Class');
+      screen.classList.contains('screen3Class')||
+      screen.classList.contains('screen8Class');
       //AÑADIR LAS QUE QUERAMOS
     ;
 
@@ -296,6 +299,7 @@ document.addEventListener('DOMContentLoaded', () => {
       screen5Class: 2, 
       screen6Class: 1,
       screen7Class: 2,
+      screen8Class: 1,
     };
 
     // Combobox // 1º  PANTALLAS QUE LLEVEN COMBOBOX

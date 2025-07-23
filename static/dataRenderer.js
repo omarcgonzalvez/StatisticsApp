@@ -374,3 +374,93 @@ function normalizeData(data) {
     addPieChart('screen7AxisDistanceContainer', data.axisDistance.map(a => a.value), titleArray.axisDistance);
     addPieChart('screen7AxisCyclesContainer', data.axisCycles.map(a => a.value), titleArray.axisCycles);
   }
+
+  export function showTemperatureGraph() {
+    const containerId = 'screen8TemperatureContainer'; // ID del contenedor donde irá la gráfica
+    const contenedor = document.getElementById(containerId);
+  
+    if (!contenedor) {
+      console.warn(`Contenedor con id ${containerId} no encontrado`);
+      return;
+    }
+  
+    // Limpieza previa de canvas no deseados
+    contenedor.querySelectorAll('canvas.lineChartClass').forEach(el => el.remove());
+  
+    // Crear un canvas para la gráfica
+    const canvas = document.createElement('canvas');
+    canvas.className = 'lineChartClass';
+    canvas.width = 400;
+    canvas.height = 200;
+    canvas.id = containerId + '-lineChartClass';
+  
+    // Añádelo dentro del contenedor
+    contenedor.appendChild(canvas);
+  
+    // Datos ficticios (últimos 10 valores de temperatura)
+    const temperaturas = [2, 7, 4, 1, -4, -5, -8, -1, 6, 12, -4, -8, 2, 7, 4, 1, -4, -5, -8, -1, 6, 12, -4, -8]; // Valores de ejemplo
+    const etiquetas = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']; // Etiquetas de los puntos
+  
+    // Crear la gráfica
+    const ctx = canvas.getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: etiquetas, // Etiquetas para los puntos
+        datasets: [{
+          label: 'Temperatura (°C)',
+          data: temperaturas, // Datos numéricos
+          borderColor: '#4e73df', // Color de la línea
+          backgroundColor: 'rgba(78, 115, 223, 0.1)', // Color de relleno bajo la línea
+          borderWidth: 2,
+          tension: 0.4, // Suavizar la línea
+          pointHitRadius: 50 // Aumenta el área de detección del cursor alrededor del punto
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            display: true,
+            labels: {
+              font: { size: 14 }
+            }
+          },
+          tooltip: {
+            titleFont: {
+              size: 16, // Tamaño de la fuente del título
+              weight: 'bold' // Negrita para el título
+            },
+            bodyFont: {
+              size: 16, // Tamaño de la fuente del cuerpo
+              weight: 'bold' // Negrita para el cuerpo
+            },
+            padding: 10, // Espaciado interno del tooltip
+            boxPadding: 5, // Espaciado adicional alrededor del tooltip
+            callbacks: {
+              label: function(tooltipItem) {
+                return `${tooltipItem.raw} °C`;
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            title: {
+              display: true,
+              text: 'Últimos 10 registros',
+              font: { size: 14 }
+            }
+          },
+          y: {
+            title: {
+              display: true,
+              text: 'Temperatura (°C)',
+              font: { size: 14 }
+            },
+            beginAtZero: true
+          }
+        }
+      }
+    });
+  }
