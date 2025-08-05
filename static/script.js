@@ -9,8 +9,8 @@ import {
 } from './dataRenderer.js';  
 
 const screens = ['screenMain', 'screen2Id', 'screen3Id', 'screen4Id', 'screen5Id', 'screen6Id', 'screen7Id','screen8Id']; //ARRAY DEFINIR VISTAS A UTILIZAR
-const screenClasses = '.screen2Class,.screen3Class,.screen4Class,.screen5Class,.screen6Class,.screen7Class.screen8Class';
-const screenHeaderClasses = '.screen2HeaderClass,.screen3HeaderClass,.screen4HeaderClass,.screen5HeaderClass,.screen6HeaderClass,.screen7HeaderClass,.screen8HeaderClass'
+const screenClasses = '.screen2Class, .screen3Class, .screen4Class, .screen5Class, .screen6Class, .screen7Class, .screen8Class';
+const screenHeaderClasses = '.screen2HeaderClass, .screen3HeaderClass, .screen4HeaderClass, .screen5HeaderClass, .screen6HeaderClass, .screen7HeaderClass, .screen8HeaderClass'
 const screenSubHeaderClasses = '.screen2SubHeaderClass, .screen3SubHeaderClass, .screen4SubHeaderClass, .screen5SubHeaderClass, .screen6SubHeaderClass, .screen7SubHeaderClass, .screen8SubHeaderClass';
 
 //INICIALIZACION
@@ -193,7 +193,7 @@ document.addEventListener('change', e => {
   if (!e.target.matches('.datetimeInputClass')) return;
 
   const screen = e.target.closest(
-    '.screen2Class, .screen3Class, .screen4Class, .screen5Class, .screen6Class, .screen7Class'
+    '.screen2Class, .screen3Class, .screen4Class, .screen5Class, .screen6Class, .screen7Class, .screen8Class'
   );
 
   if (!screen) return;   // por si acaso
@@ -221,6 +221,9 @@ document.addEventListener('change', e => {
       break;
     case 'screen7Id':
       showDataPromediosFiltrar();
+      break;
+    case 'screen8Id':
+      showTemperatureGraph();
       break;
     default:
       console.warn(`No se encontró una función para actualizar la pantalla: ${screenId}`);
@@ -274,8 +277,11 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll(screenClasses).forEach(screen => {
     // el sub‑header donde van los controles
     const subHeader = screen.querySelector(screenSubHeaderClasses);
-    if (!subHeader) return;                        // por si falta
-
+    if (!subHeader) {
+      console.warn(`No se encontró el subHeader para ${screen.id}`);
+      return;
+    }
+    console.log(`SubHeader encontrado para ${screen.id}`);
     const withComboBox =
       screen.classList.contains('screen2Class') ||
       screen.classList.contains('screen3Class')||
@@ -634,7 +640,7 @@ document.addEventListener('change', e => {
   if (!e.target.matches('.comboBoxClass')) return;
 
   const screen = e.target.closest(
-    '.screen2Class, .screen3Class, .screen4Class, .screen5Class, .screen6Class, .screen7Class'
+    '.screen2Class, .screen3Class, .screen4Class, .screen5Class, .screen6Class, .screen7Class, .screen8Class'
   );
 
   if (!screen) return; // por si acaso
@@ -661,6 +667,9 @@ document.addEventListener('change', e => {
       break;
     case 'screen7Id':
       showDataPromediosFiltrar();
+      break;
+    case 'screen8Id':
+      showTemperatureGraph();
       break;
     default:
       console.warn(`No se encontró una función para actualizar la pantalla: ${screenId}`);

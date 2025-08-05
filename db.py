@@ -116,4 +116,24 @@ def obtener_filas():               #Devuelve todas las filas de la tabla
             FROM Statistics_APS3D
         """)
         return cursor.fetchall()
+    
+def obtener_temperaturas(maquina, fecha):
+    """
+    Devuelve las 20 últimas temperaturas registradas para una máquina específica
+    antes de una fecha dada.
+    """
+    with get_conn() as conn:
+        cursor = conn.execute("""
+            SELECT Date, Temp_Cabinet
+            FROM Statistics_APS3D
+            WHERE DeviceName = ? AND Date < ?
+            ORDER BY Date DESC
+            LIMIT 3
+        """, (maquina, fecha))
+        registros = cursor.fetchall()
+
+    if not registros:
+        return None
+
+    return [{'date': row[0], 'temperature': row[1]} for row in registros]
 

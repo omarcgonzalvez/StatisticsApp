@@ -195,6 +195,7 @@ function normalizeData(data) {
     screen5: '/api/totales_diferencia',
     screen6: '/api/promedios_por_fecha',
     screen7: '/api/promedios_diferencia',
+    screen8: '/api/temperaturas', // Endpoint para la gráfica de temperatura
   };
   
   /* 1‑b   Recoge máquina y fechas de la UI (si existen) */
@@ -238,27 +239,34 @@ function normalizeData(data) {
   async function loadData(screenPrefix, fallback = {}) {
     const endpoint = ENDPOINTS[screenPrefix];
     if (!endpoint) return fallback;
-  
+
     const params = collectParams(screenPrefix);
     const qs = new URLSearchParams(params).toString();
-  
+
     try {
-      const rsp = await fetch(`${endpoint}?${qs}`);
-      if (!rsp.ok) {
-        if (rsp.status === 400) {
-          alert("HTTP Request Error 400 (BAD REQUEST): The request is invalid. Please check the input data and try again.");
-        } else if (rsp.status === 404) {
-          alert("HTTP Request Error 404 (NOT FOUND): No data found for the given request.");
+        const rsp = await fetch(`${endpoint}?${qs}`);
+        if (!rsp.ok) {
+            if (rsp.status === 400) {
+                alert("HTTP Request Error 400 (BAD REQUEST): The request is invalid. Please check the input data and try again.");
+            } else if (rsp.status === 404) {
+                alert("HTTP Request Error 404 (NOT FOUND): No data found for the given request.");
+            }
+            throw new Error(`${rsp.status}`);
         }
-        throw new Error(`${rsp.status}`);
-      }
-      const json = await rsp.json();
-      console.log(`[loadData] ${screenPrefix}:`, json); // Depuración: muestra los datos obtenidos
-      const normalizedData = normalizeData(json);
-      return normalizedData;
+        const json = await rsp.json();
+        console.log(`[loadData] ${screenPrefix}:`, json); // Depuración: muestra los datos obtenidos
+
+        // Si es screen8, devuelve los datos sin normalizar
+        if (screenPrefix === 'screen8') {
+            return json;
+        }
+
+        // Para otros casos, normaliza los datos
+        const normalizedData = normalizeData(json);
+        return normalizedData;
     } catch (err) {
-      console.error(`[dataRenderer] ${endpoint} falló:`, err);
-      return fallback; // fallback (mock) si algo va mal
+        console.error(`[dataRenderer] ${endpoint} falló:`, err);
+        return fallback; // fallback (mock) si algo va mal
     }
   }
   
@@ -375,92 +383,104 @@ function normalizeData(data) {
     addPieChart('screen7AxisCyclesContainer', data.axisCycles.map(a => a.value), titleArray.axisCycles);
   }
 
-  export function showTemperatureGraph() {
+  export async function showTemperatureGraph() {
     const containerId = 'screen8TemperatureContainer'; // ID del contenedor donde irá la gráfica
     const contenedor = document.getElementById(containerId);
-  
+
     if (!contenedor) {
-      console.warn(`Contenedor con id ${containerId} no encontrado`);
-      return;
+        console.warn(`Contenedor con id ${containerId} no encontrado`);
+        return;
     }
-  
+
     // Limpieza previa de canvas no deseados
     contenedor.querySelectorAll('canvas.lineChartClass').forEach(el => el.remove());
-  
+
     // Crear un canvas para la gráfica
     const canvas = document.createElement('canvas');
     canvas.className = 'lineChartClass';
     canvas.width = 400;
     canvas.height = 200;
     canvas.id = containerId + '-lineChartClass';
-  
+
     // Añádelo dentro del contenedor
     contenedor.appendChild(canvas);
-  
-    // Datos ficticios (últimos 10 valores de temperatura)
-    const temperaturas = [2, 7.8, 4, 1, -4.5, -5, -8, -1, 6, 12.5, -4, -8, 2, 7, 4, 1, -4, -5, -8, -1, 6, 12, -4, -8]; // Valores de ejemplo
-    const etiquetas = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']; // Etiquetas de los puntos
-  
-    // Crear la gráfica
-    const ctx = canvas.getContext('2d');
-    new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: etiquetas, // Etiquetas para los puntos
-        datasets: [{
-          label: 'Temperatura (°C)',
-          data: temperaturas, // Datos numéricos
-          borderColor: '#4e73df', // Color de la línea
-          backgroundColor: 'rgba(78, 115, 223, 0.1)', // Color de relleno bajo la línea
-          borderWidth: 2,
-          tension: 0.4, // Suavizar la línea
-          pointHitRadius: 50 // Aumenta el área de detección del cursor alrededor del punto
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: {
-            display: true,
-            labels: {
-              font: { size: 14 }
-            }
-          },
-          tooltip: {
-            titleFont: {
-              size: 16, // Tamaño de la fuente del título
-              weight: 'bold' // Negrita para el título
-            },
-            bodyFont: {
-              size: 16, // Tamaño de la fuente del cuerpo
-              weight: 'bold' // Negrita para el cuerpo
-            },
-            padding: 10, // Espaciado interno del tooltip
-            boxPadding: 5, // Espaciado adicional alrededor del tooltip
-            callbacks: {
-              label: function(tooltipItem) {
-                return `${tooltipItem.raw} °C`;
-              }
-            }
-          }
-        },
-        scales: {
-          x: {
-            title: {
-              display: true,
-              text: 'Últimos 10 registros',
-              font: { size: 14 }
-            }
-          },
-          y: {
-            title: {
-              display: true,
-              text: 'Temperatura (°C)',
-              font: { size: 14 }
-            },
-            beginAtZero: true
-          }
+
+    try {
+        // Llamar a loadData para obtener los datos
+        const data = await loadData('screen8', []); // Usa 'screen8' como prefijo para obtener los datos
+
+        if (!data || data.length === 0) {
+            console.warn('No se encontraron datos para la gráfica de temperaturas');
+            return;
         }
-      }
-    });
-  }
+        console.log('Datos recibidos en showTemperatureGraph:', data);
+        // Extraer etiquetas y datos
+        const etiquetas = data.map(d => d.date);
+        const temperaturas = data.map(d => d.temperature);
+
+        // Crear la gráfica
+        const ctx = canvas.getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: etiquetas, // Etiquetas para los puntos
+                datasets: [{
+                    label: 'Temperatura (°C)',
+                    data: temperaturas, // Datos numéricos
+                    borderColor: '#4e73df', // Color de la línea
+                    backgroundColor: 'rgba(78, 115, 223, 0.1)', // Color de relleno bajo la línea
+                    borderWidth: 2,
+                    tension: 0.4, // Suavizar la línea
+                    pointHitRadius: 50 // Aumenta el área de detección del cursor alrededor del punto
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: true,
+                        labels: {
+                            font: { size: 14 }
+                        }
+                    },
+                    tooltip: {
+                        titleFont: {
+                            size: 16, // Tamaño de la fuente del título
+                            weight: 'bold' // Negrita para el título
+                        },
+                        bodyFont: {
+                            size: 16, // Tamaño de la fuente del cuerpo
+                            weight: 'bold' // Negrita para el cuerpo
+                        },
+                        padding: 10, // Espaciado interno del tooltip
+                        boxPadding: 5, // Espaciado adicional alrededor del tooltip
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                return `${tooltipItem.raw} °C`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Fecha',
+                            font: { size: 14 }
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Temperatura (°C)',
+                            font: { size: 14 }
+                        },
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Error al actualizar la gráfica:', error);
+    }
+}
