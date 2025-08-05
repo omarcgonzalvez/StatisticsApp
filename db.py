@@ -50,7 +50,7 @@ def insert_or_update(data): #Insertamos o actualizamos los datos
                 spare = stats["Spare"]
                 engines = stats["Engines"]
                 conn.execute('''
-                    INSERT OR REPLACE INTO Statistics_APS3D VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    INSERT OR REPLACE INTO Statistics_APS3D VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ''', (
                     device,
                     date,

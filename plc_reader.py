@@ -1,8 +1,15 @@
 import snap7
 from snap7.util import get_byte, get_dint, get_udint, get_int
 from datetime import datetime
-import time
+import time, struct
 from db import insert_or_update, create_table
+
+def ieee_754_to_float(value):   #Conversión de IEEE 754 a FLOAT
+    """
+    Convierte un valor en formato IEEE 754 a un número de punto flotante.
+    Redondea el resultado a 1 decimal.
+    """
+    return round((struct.unpack('!f', struct.pack('!I', value))[0]), 1)
 
 def ms_to_hms(ms):              #Conversión MILISEGUNDOS A HORAS:MINUTOS:SEGUNDOS
     total_seconds = ms // 1000
@@ -70,7 +77,7 @@ def leer_un_elemento(db_bytes, offset):     #Función para leer los valores del 
         "Canceled_Tasks": CanceledTasks,
         "Movements_Completed": MovementsCompleted,
         "Tasks_Completed": TasksCompleted,
-        "Temp_Cabinet": Temp_Cabinet,  # Nueva variable
+        "Temp_Cabinet": ieee_754_to_float(Temp_Cabinet),  # Nueva variable
         "Spare": Spare,             # Lista de valores Spare
         "Errors": Errors,
         "Engines": Engines

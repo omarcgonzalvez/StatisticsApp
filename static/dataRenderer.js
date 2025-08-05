@@ -398,7 +398,7 @@ function normalizeData(data) {
     contenedor.appendChild(canvas);
   
     // Datos ficticios (últimos 10 valores de temperatura)
-    const temperaturas = [2, 7, 4, 1, -4, -5, -8, -1, 6, 12, -4, -8, 2, 7, 4, 1, -4, -5, -8, -1, 6, 12, -4, -8]; // Valores de ejemplo
+    const temperaturas = [2, 7.8, 4, 1, -4.5, -5, -8, -1, 6, 12.5, -4, -8, 2, 7, 4, 1, -4, -5, -8, -1, 6, 12, -4, -8]; // Valores de ejemplo
     const etiquetas = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']; // Etiquetas de los puntos
   
     // Crear la gráfica
