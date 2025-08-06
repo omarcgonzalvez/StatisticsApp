@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, jsonify
-from db import obtener_datos, obtener_filas, obtener_datos_por_fecha
+from db import obtener_datos, obtener_filas, obtener_datos_por_fecha, obtener_temperaturas
 from datetime import datetime
 from collections import defaultdict
 
@@ -396,3 +396,31 @@ def api_promedios_diferencia():
             promedios[key] = totales[key] / num_maquinas
 
     return jsonify(promedios)
+
+
+
+@app.route('/api/temperaturas')
+def api_temperaturas():
+    """
+    API para obtener las 20 últimas temperaturas registradas para una máquina específica
+    antes de una fecha dada.
+    """
+    maquina = request.args.get('maquina')  # Máquina seleccionada desde el combobox
+    fecha = request.args.get('fecha')  # Fecha única proporcionada
+
+    # Validar parámetros
+    if not maquina or not fecha:
+        return jsonify({'error': 'Parámetros requeridos: maquina y fecha'}), 400
+
+    try:
+        datetime.fromisoformat(fecha)  # Validar formato de fecha
+    except ValueError:
+        return jsonify({'error': 'Formato de fecha inválido. Usa ISO: YYYY-MM-DDTHH:MM'}), 400
+
+    # Obtener las temperaturas desde la base de datos
+    datos = obtener_temperaturas(maquina, fecha)
+
+    if not datos:
+        return jsonify({'error': 'No se encontraron registros para la máquina seleccionada'}), 404
+
+    return jsonify(datos)

@@ -7,7 +7,7 @@
 }
 
 /*SCREEN 2.3.4.5....*/
-.screen2Class,.screen3Class,.screen4Class,.screen5Class,.screen6Class,.screen7Class{
+.screen2Class,.screen3Class,.screen4Class,.screen5Class,.screen6Class,.screen7Class,.screen8Class{
   align-items: flex-start;   /* alinea todo por arriba */
   gap: 24px;                 /* espacio entre columnas */
   padding-inline: 100px;
@@ -15,7 +15,7 @@
 }
 
 /*Encbezado para screen2*/
-.screen2HeaderClass,.screen3HeaderClass,.screen4HeaderClass,.screen5HeaderClass,.screen6HeaderClass,.screen7HeaderClass{
+.screen2HeaderClass,.screen3HeaderClass,.screen4HeaderClass,.screen5HeaderClass,.screen6HeaderClass,.screen7HeaderClass,.screen8HeaderClass{
   display: flex;
   align-items: center;
   gap: 50px;
@@ -23,7 +23,7 @@
 }
 
 /* Contenedor donde van los dos controles */
-.screen2SubHeaderClass, .screen3SubHeaderClass, .screen4SubHeaderClass, .screen5SubHeaderClass, .screen6SubHeaderClass, .screen7SubHeaderClass{
+.screen2SubHeaderClass, .screen3SubHeaderClass, .screen4SubHeaderClass, .screen5SubHeaderClass, .screen6SubHeaderClass, .screen7SubHeaderClass, .screen8SubHeaderClass {
   display: flex;
   align-items: center;
   gap: 50px;         /* ← separación fija entre combobox y fecha */

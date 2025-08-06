@@ -24,19 +24,20 @@
             <button class="button" id="btnTotalFiltrar">TOTAL FLTRAR</button>
             <button class="button" id="btnPromedios">PROMEDIOS</button>
             <button class="button" id="btnPromediosFiltrar">PROMEDIOS FILTRAR</button>
+            <button class="button" id="btnTemperaturas">TEMPERATURAS</button>
             <!--<button class="button" id="btnGrid">GRID</button>-->
           </div>
 
           <!-- COLUMNA DE IMÁGENES -->
           <div class="image-container">
-            <img src="/static/logo.png"  alt="Logo"  width="600">
-            <img src="/static/aps3d.avif" alt="APS 3D" width="1000">
+            <img src="/static/images/logo.png"  alt="Logo"  width="600">
+            <img src="/static/images/aps3d.avif" alt="APS 3D" width="1000">
           </div>
     </div>
 
   <!-- SCREEN_2 RESUMEN GENERAL -->
     <div id="screen2Id" class="screen2Class hidden">
-      <img class="aps3d-float" src="/static/aps3d_1.avif" alt="APS3D" >
+      <img class="aps3d-float" src="/static/images/aps3d_1.avif" alt="APS3D" >
           <div class="screen2HeaderClass">
             <!--<div class="button-container">-->
               <h1>RESUMEN GENERAL</h1>
@@ -81,7 +82,7 @@
 
   <!-- SCREEN_3 RESUMEN GENERAL -->
     <div id="screen3Id" class="screen3Class hidden">
-      <img class="aps3d-float" src="/static/aps3d_1.avif" alt="APS3D" >
+      <img class="aps3d-float" src="/static/images/aps3d_1.avif" alt="APS3D" >
       <div class="screen3HeaderClass">
         <!--<div class="button-container">-->
           <h1>FILTRAR POR FECHA</h1>
@@ -125,7 +126,7 @@
 
   <!-- SCREEN_4 TOTAL -->
     <div id="screen4Id" class="screen4Class hidden">
-      <img class="aps3d-float" src="/static/aps3d_1.avif" alt="APS3D" >
+      <img class="aps3d-float" src="/static/images/aps3d_1.avif" alt="APS3D" >
           <div class="screen4HeaderClass">
             <!--<div class="button-container">-->
               <h1>TOTAL</h1>
@@ -171,7 +172,7 @@
 
     <!-- SCREEN_5 TOTAL FILTRAR -->
     <div id="screen5Id" class="screen5Class hidden">
-      <img class="aps3d-float" src="/static/aps3d_1.avif" alt="APS3D" >
+      <img class="aps3d-float" src="/static/images/aps3d_1.avif" alt="APS3D" >
       <div class="screen5HeaderClass">
         <!--<div class="button-container">-->
           <h1>TOTAL FILTRAR</h1>
@@ -217,7 +218,7 @@
 
   <!-- SCREEN_6 PROMEDIOS -->
     <div id="screen6Id" class="screen6Class hidden">
-      <img class="aps3d-float" src="/static/aps3d_1.avif" alt="APS3D" >
+      <img class="aps3d-float" src="/static/images/aps3d_1.avif" alt="APS3D" >
         <div class="screen6HeaderClass">
           <!--<div class="button-container">-->
             <h1>PROMEDIOS</h1>
@@ -263,7 +264,7 @@
 
   <!-- SCREEN_7 PROMEDIOS FILTRAR -->
   <div id="screen7Id" class="screen7Class hidden">
-    <img class="aps3d-float" src="/static/aps3d_1.avif" alt="APS3D" >
+    <img class="aps3d-float" src="/static/images/aps3d_1.avif" alt="APS3D" >
     <div class="screen7HeaderClass">
       <!--<div class="button-container">-->
         <h1>PROMEDIOS FILTRAR</h1>
@@ -307,6 +308,33 @@
   
   </div>
 
+  <!-- SCREEN_8 TEMPERATURAS -->
+  <div id="screen8Id" class="screen8Class hidden">
+    <!--<img class="aps3d-float" src="/static/images/aps3d_1.avif" alt="APS3D" >-->
+    <div class="screen8HeaderClass">
+      <!--<div class="button-container">-->
+        <h1>TEMPERATURAS</h1>
+        <!--<h2>StatisticsApp</h2>-->
+        <!--<p>&copy; 2025 Omar Campañó. All rights reserved.</p>-->
+        <button class="button btnInicio" id="btnInicio">INICIO</button>
+      <!--</div>-->
+    </div>
+
+    <div class="screen8SubHeaderClass">
+    </div>
+    <div id="screen8TemperatureContainer" class="temperatureContainer">
+      <!-- Aquí se generará la gráfica -->
+    </div>
+
+      <!--<h1>Estadisticas</h1>>-->
+      <br>
+
+
+    <!--<div class="image-container renderAPS3D">
+      <img src="aps3d_1.avif" alt="APS3D" >
+    </div>-->
+  
+  </div>
   <!--<script src="C:/Users/omar.campano/Desktop/StatisticsApp/static/script.js"></script>-->
   <script type="module"  src="/static/script.js"></script>
 </body>

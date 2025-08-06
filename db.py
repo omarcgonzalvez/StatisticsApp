@@ -19,6 +19,15 @@ def create_table(): #Creamos la estructura de la tabla de la base de datos
                 Canceled_Tasks INTEGER,
                 Movements_Completed INTEGER,
                 Tasks_Completed INTEGER,
+                Temp_Cabinet REAL,
+                Spare_0 INTEGER, 
+                Spare_1 INTEGER,
+                Spare_2 INTEGER,
+                Spare_3 INTEGER,
+                Spare_4 INTEGER,
+                Spare_5 INTEGER,
+                Spare_6 INTEGER,
+                Spare_7 INTEGER,
                 Errors INTEGER,
                 AXIS_X_Cycles INTEGER,
                 AXIS_X_MoveTime TEXT,
@@ -38,9 +47,10 @@ def insert_or_update(data): #Insertamos o actualizamos los datos
     with get_conn() as conn:
         for device, dates in data.items():
             for date, stats in dates.items():
+                spare = stats["Spare"]
                 engines = stats["Engines"]
                 conn.execute('''
-                    INSERT OR REPLACE INTO Statistics_APS3D VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    INSERT OR REPLACE INTO Statistics_APS3D VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ''', (
                     device,
                     date,
@@ -52,6 +62,8 @@ def insert_or_update(data): #Insertamos o actualizamos los datos
                     stats["Canceled_Tasks"],
                     stats["Movements_Completed"],
                     stats["Tasks_Completed"],
+                    stats["Temp_Cabinet"],
+                    spare[0], spare[1], spare[2], spare[3], spare[4], spare[5], spare[6], spare[7],
                     stats["Errors"],
                     engines["AXIS_X"]["Cycles"],    # AXIS_X
                     engines["AXIS_X"]["MoveTime"],
@@ -104,4 +116,28 @@ def obtener_filas():               #Devuelve todas las filas de la tabla
             FROM Statistics_APS3D
         """)
         return cursor.fetchall()
+    
+def obtener_temperaturas(maquina, fecha):
+    """
+    Devuelve las 20 últimas temperaturas registradas para una máquina específica
+    antes de una fecha dada.
+    """
+    with get_conn() as conn:
+        cursor = conn.execute("""
+            SELECT Date, Temp_Cabinet
+            FROM (
+                SELECT Date, Temp_Cabinet
+                FROM Statistics_APS3D
+                WHERE DeviceName = ? AND Date <= ?
+                ORDER BY Date DESC
+                LIMIT 20
+            ) subquery
+            ORDER BY Date ASC
+        """, (maquina, fecha))
+        registros = cursor.fetchall()
+
+    if not registros:
+        return None
+
+    return [{'date': row[0], 'temperature': row[1]} for row in registros]
 
