@@ -125,10 +125,14 @@ def obtener_temperaturas(maquina, fecha):
     with get_conn() as conn:
         cursor = conn.execute("""
             SELECT Date, Temp_Cabinet
-            FROM Statistics_APS3D
-            WHERE DeviceName = ? AND Date < ?
-            ORDER BY Date DESC
-            LIMIT 3
+            FROM (
+                SELECT Date, Temp_Cabinet
+                FROM Statistics_APS3D
+                WHERE DeviceName = ? AND Date <= ?
+                ORDER BY Date DESC
+                LIMIT 20
+            ) subquery
+            ORDER BY Date ASC
         """, (maquina, fecha))
         registros = cursor.fetchall()
 
