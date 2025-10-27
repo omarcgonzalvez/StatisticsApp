@@ -139,11 +139,23 @@ def calcular_diferencias(filas, fecha_ini_dt, fecha_fin_dt):
 
     datos_por_dispositivo = defaultdict(list)
 
+    #for fila in filas:         # LÓGICA ORIGINAL SIN CONTROL DE ERRORES EN FECHA, CON 00 DA ERROR
+    #    device = fila[0]
+    #    fecha_dt = datetime.fromisoformat(fila[1])
+    #    datos = fila[2:]
+    #    datos_por_dispositivo[device].append((fecha_dt, datos))
+
     for fila in filas:
         device = fila[0]
-        fecha_dt = datetime.fromisoformat(fila[1])
+    # Convertimos la fecha de forma segura
+        try:
+            fecha_dt = datetime.fromisoformat(fila[1])
+        except Exception:
+            # Si la fecha es inválida, saltamos esta fila para no marcarnos un 500 invalid isoformat string
+            continue
         datos = fila[2:]
         datos_por_dispositivo[device].append((fecha_dt, datos))
+
 
     campos = [
         "TimeChargingBatt", "AutoAndSearch", "AutoAndOrder",
